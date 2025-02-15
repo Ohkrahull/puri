@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "puri-89f9e"
+  },
+  "targets": {
+    "puri-89f9e": {
+      "hosting": {
+        "app-velvetlife-in": [
+          "app-velvetlife-in"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

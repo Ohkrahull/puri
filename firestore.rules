@@ -1,0 +1,16 @@
+// Firebase Storage Rules
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow admin users to read and write all documents
+    match /documents/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Allow users to read and write their own documents
+    match /documents/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
