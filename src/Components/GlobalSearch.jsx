@@ -817,7 +817,7 @@ const GlobalSearchDropdown = () => {
           id="global-search-input"
           type="search"
           placeholder="Search"
-          className="w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+          className="w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 text-base"
           value={searchTerm}
           onChange={handleSearchChange}
           onFocus={() => searchTerm && performSearch(searchTerm)}
@@ -829,14 +829,17 @@ const GlobalSearchDropdown = () => {
               setSearchResults([]);
               setIsDropdownOpen(false);
             }}
+            style={{cursor: 'pointer'}}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
-            <X size={20} />
+            {/* <X size={14} /> */}
           </button>
         )}
         {!searchTerm && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <kbd className="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-gray-400 rounded">
+            <kbd 
+            
+            className="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-gray-400 rounded">
               ctrl + k
             </kbd>
           </div>

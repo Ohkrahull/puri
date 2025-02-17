@@ -172,7 +172,7 @@ const Flatmain = () => {
           </div>
         </div>
       )}
-       <AddFlatHighlighter />
+       {/* <AddFlatHighlighter /> */}
     </div>
     
   );
