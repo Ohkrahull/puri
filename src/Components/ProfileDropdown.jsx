@@ -23,18 +23,19 @@ const ProfileDropdown = ({ user, onLogout }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="w-[36px] h-[36px] rounded-full bg-purple-500 flex items-center justify-center">
-          <span className="text-white text-sm">
+          <span className="text-white text-[16px]">
             {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
           </span>
         </div>
         <div className="hidden md:block text-left">
-          <p className="text-sm font-medium text-gray-700 line-clamp-1">
+          <p className="text-[14px] font-medium text-gray-700 line-clamp-1">
             {user?.firstName} {user?.lastName}
           </p>
           <p className="text-xs text-gray-500">Admin</p>
+          {/* <p className="text-xs text-gray-500">Admin</p> */}
         </div>
         <ChevronDown 
-          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+          className={`h-6 w-6 text-gray-500 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`} 
         />
@@ -42,7 +43,7 @@ const ProfileDropdown = ({ user, onLogout }) => {
 
       {/* Dropdown Menu */}
       <div 
-        className={`absolute right-0 mt-2 w-48 origin-top-right transform transition-all duration-200 ease-out ${
+        className={`absolute right-0 mt-3 w-48 origin-top-right transform transition-all duration-200 ease-out ${
           isOpen 
             ? 'opacity-100 scale-100 translate-y-0' 
             : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
@@ -52,7 +53,7 @@ const ProfileDropdown = ({ user, onLogout }) => {
           <div className="py-1">
             <button
               onClick={onLogout}
-              className="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full px-4 py-2 text-[14px] text-red-600 hover:bg-gray-50 flex items-center gap-2"
             >
               <span>Logout</span>
               <svg 

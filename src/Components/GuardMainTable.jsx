@@ -8,6 +8,7 @@ import DeleteModal from '../Modals/DeleteModal';
 import SortButton from '../Buttons/Sortdate';
 import StatusBadge from './StatusBadge';
 import { PencilSimple } from 'phosphor-react';
+import { useImageViewer } from '../context/ImageViewerContext';
 
 // // Confirmation Dialog Component
 // const ConfirmationDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
@@ -414,6 +415,7 @@ const GuardTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteItemName, setDeleteItemName] = useState('');
   const [deleteFunction, setDeleteFunction] = useState(null);
+  const { openImageViewer } = useImageViewer();
 
   const navigate = useNavigate();
   const db = getFirestore(getApp());
@@ -632,7 +634,7 @@ const GuardTable = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
-                        <img 
+                        {/* <img 
                           className="h-10 w-10 rounded-full object-cover"
                           src={helper.imageUrl || '/placeholder.jpg'}
                           alt=""
@@ -640,7 +642,25 @@ const GuardTable = () => {
                             e.target.onerror = null;
                             e.target.src = '/Images/profile.png';
                           }}
-                        />
+                        /> */}
+                         <div className="relative group">
+                <img 
+                  src={helper.imageUrl} 
+                  alt={`${helper.firstName || ''} ${helper.lastName || ''}`}
+                  className="w-10 h-10 rounded-full object-cover cursor-zoom-in transition-all duration-200 group-hover:ring-2 group-hover:ring-blue-500"
+                  onClick={() => openImageViewer(
+                    helper.imageUrl,
+                    `${helper.firstName || ''} ${helper.lastName || ''}`
+                  )}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/Images/profile.png';
+                  }}
+                />
+                <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                  Click to view
+                </div>
+              </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900" style={{fontSize:'14px'}}>

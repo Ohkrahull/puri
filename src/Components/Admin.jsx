@@ -9,6 +9,7 @@ import BookingServiceTable from "./BookingServiceTable";
 import { useAuth } from "../context/AuthContext";
 import ExportModal from './expotCustomeDateBooking';
 import EditingBookingModal from "./EditingModal";
+import { AddIcon, ExportIcon, HighlightButton } from "./HighLightButton";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState("Amenities");
@@ -69,7 +70,7 @@ const Admin = () => {
             </p>
           </div>
           <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", justifyItems: "flex-end", zIndex: '10'}}>
-            <button
+            {/* <button
               onClick={() => setShowExportModal(true)}
               style={{
                 display: "flex",
@@ -97,7 +98,22 @@ const Admin = () => {
                 </svg>
               </span>
               {activeTab === "Amenities" ? "Add Booking" : "Add Service"}
-            </button>
+            </button> */}
+            <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
+
+<HighlightButton 
+  type="primary"
+  onClick={handleAddClick}
+>
+  <AddIcon />
+  {activeTab === "Amenities" ? "Add Booking" : "Add Service"}
+</HighlightButton>
           </div>
         </div>
       </div>

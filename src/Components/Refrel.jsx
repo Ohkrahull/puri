@@ -4,6 +4,7 @@ import "../App.css";
 import "../index.css";
 import ReferralsTable from '../Tables/RefrrelsTable';
 import ExportModal from "../Tables/exportRefferal";
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 
 const Referrals = () => {
     const [showExportModal, setShowExportModal] = useState(false);
@@ -49,7 +50,7 @@ const Referrals = () => {
             justifyItems: "flex-end",
           }}
         >
-          <button
+          {/* <button
             onClick={() => setShowExportModal(true)}
             style={{
               display: "flex",
@@ -69,7 +70,14 @@ const Referrals = () => {
               </svg>
             </span>
             Export
-          </button>
+          </button> */}
+           <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
         </div>
       </div>
 

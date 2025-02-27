@@ -45,7 +45,7 @@
 
 //   const filteredBookings = bookings.filter(
 //     (booking) =>
-//       (booking.userDetails && 
+//       (booking.userDetails &&
 //        `${booking.userDetails.firstName || ''} ${booking.userDetails.lastName || ''}`
 //         .toLowerCase()
 //         .includes(searchTerm.toLowerCase())) ||
@@ -57,13 +57,13 @@
 //     if (text.length <= charLimit) {
 //       return text;
 //     }
-    
+
 //     const lastSpace = text.lastIndexOf(' ', charLimit);
-    
+
 //     if (lastSpace > 0) {
 //       return text.slice(0, lastSpace) + '...';
 //     }
-    
+
 //     return text.slice(0, charLimit) + '...';
 //   };
 
@@ -179,7 +179,7 @@
 //   useEffect(() => {
 //     fetchAllBookings((fetchedBookings) => {
 //       console.log("fetchedBookings",fetchedBookings);
-      
+
 //       setBookings(fetchedBookings);
 //       setFilteredBookings(fetchedBookings);
 //     });
@@ -240,7 +240,6 @@
 //   setSelectedBooking(null);
 // };
 
-
 // const handleSaveBooking = async (bookingData) => {
 //   try {
 //     if (selectedBooking) {
@@ -252,7 +251,7 @@
 //       await saveBooking(bookingData);
 //       toast.success('Booking created successfully');
 //     }
-    
+
 //     // Refresh the bookings list
 //     fetchAllBookings(setBookings);
 //     handleModalClose();
@@ -295,7 +294,7 @@
 //   const filterBookings = useCallback(
 //     (bookingOrTerm, amenity) => {
 //       let filtered = bookings;
-  
+
 //       if (bookingOrTerm) {
 //         if (typeof bookingOrTerm === 'string') {
 //           const term = bookingOrTerm.toLowerCase();
@@ -316,7 +315,7 @@
 //           );
 //         }
 //       }
-  
+
 //       if (amenity && amenity !== "All Amenities") {
 //         filtered = filtered.filter(
 //           (booking) =>
@@ -330,7 +329,7 @@
 //     const dateB = dayjs(b.date.toDate());
 //     return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
 //   });
-  
+
 //       setFilteredBookings(filtered);
 //       setCurrentPage(1);
 //     },
@@ -418,7 +417,6 @@
 //   //   });
 //   //   setIsDeleteModalOpen(true);
 //   // };
-
 
 //   const handleDeleteClick = (booking) => {
 //     const firstName = booking.userDetails?.firstName || 'Unknown';
@@ -591,11 +589,10 @@
 //       const dateB = dayjs(b.date.toDate());
 //       return dateSortDirection === 'asc' ? dateA - dateB : dateB - dateA;
 //     });
-    
+
 //     setFilteredBookings(sortedBookings);
 //     setDateSortDirection(dateSortDirection === 'asc' ? 'desc' : 'asc');
 //   };
-
 
 //   const handleSort = useCallback(
 //     (startDate, endDate) => {
@@ -972,13 +969,13 @@
 //     if (text.length <= charLimit) {
 //       return text;
 //     }
-    
+
 //     const lastSpace = text.lastIndexOf(' ', charLimit);
-    
+
 //     if (lastSpace > 0) {
 //       return text.slice(0, lastSpace) + '...';
 //     }
-    
+
 //     return text.slice(0, charLimit) + '...';
 //   };
 //   // const SearchInput = ({ bookings, onSearch, onItemClick, ref, isOpen, setIsOpen }) => {
@@ -1003,9 +1000,9 @@
 //               key={tab}
 //               onClick={() => handleTabClick(tab)}
 //               className={`${tab === 'Amenities' ? '' : 'ml-3'} p-2 cursor-pointer ${
-//                 (tab === 'Amenities' && activeTab === 'Amenities') || 
+//                 (tab === 'Amenities' && activeTab === 'Amenities') ||
 //                 (tab === 'Services' && activeTab === 'Services')
-//                   ? 'border border-[#E4E7EC] bg-[#F9FAFB] font-semibold text-black' 
+//                   ? 'border border-[#E4E7EC] bg-[#F9FAFB] font-semibold text-black'
 //                   : 'text-[#6B7280]'
 //               }`}
 //               style={{ borderRadius: 8 }}
@@ -1023,7 +1020,7 @@
 //             </div> */}
 //             {/* <div className='flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full lg:w-auto'>
 //               <div className="relative w-full sm:w-auto" ref={amenityRef} style={{ width: '242px', zIndex: 30 }}>
-//                 <button 
+//                 <button
 //                   onClick={toggleDropdown}
 //                   style={{
 //                     display: 'flex',
@@ -1051,7 +1048,7 @@
 //                 </svg>
 //               </button>
 //               {isAmenityDropdownOpen && (
-//   <div 
+//   <div
 //     className="custom-scrollbar"
 //     style={{
 //       position: 'absolute',
@@ -1096,7 +1093,7 @@
 //           </div> */}
 //         </div>
 //       </div>
-          
+
 //       <div className="flex-grow overflow-auto">
 //         <table className="w-full text-sm text-gray-500" style={{ minWidth: '900px' }}>
 //           <thead className="text-xs text-gray-500 bg-gray-50 sticky top-0" style={{fontSize:'12px'}}>
@@ -1113,25 +1110,25 @@
 //               {/* <th scope="col" className="px-6 py-3 text-left" style={{minWidth: '120px'}}>
 //                 <div className="flex items-center">
 //                   Slot time
-                  
+
 //                 </div>
 //               </th> */}
 //               {/* <th scope="col" className="px-6 py-3 text-left" style={{minWidth: '120px',cursor: "pointer",}}>
 //                 <div className="flex items-center" onClick={handleDateSort}>
 //                   Slot date
-//                   <svg 
-//       className="ml-2, pointer-events-auto" 
-//       xmlns="http://www.w3.org/2000/svg" 
-//       width="17" 
-//       height="16" 
-//       viewBox="0 0 17 16" 
+//                   <svg
+//       className="ml-2, pointer-events-auto"
+//       xmlns="http://www.w3.org/2000/svg"
+//       width="17"
+//       height="16"
+//       viewBox="0 0 17 16"
 //       fill="none"
 //       style={{transform: dateSortDirection === 'desc' ? 'rotate(180deg)' : 'none', }}
 //     >
-//       <path 
-//         d="M8.66699 3.66667V12M8.66699 12L4.66699 8M8.66699 12L12.667 8" 
-//         stroke="#4B5563" 
-//         strokeLinecap="round" 
+//       <path
+//         d="M8.66699 3.66667V12M8.66699 12L4.66699 8M8.66699 12L12.667 8"
+//         stroke="#4B5563"
+//         strokeLinecap="round"
 //         strokeLinejoin="round"
 //       />
 //     </svg>
@@ -1143,7 +1140,7 @@
 //               <th scope="col" className="px-6 py-3 text-left" style={{minWidth: '40px'}}>Amenity</th>
 
 //               {/* <th scope="col" className="px-6 py-3 text-right" style={{minWidth: '120px'}}>
-//                 <span 
+//                 <span
 //                   style={{
 //                     visibility: selectedRows.length > 1 ? 'visible' : 'hidden',
 //                     cursor: 'pointer',
@@ -1272,12 +1269,12 @@
 //         </div>
 //       </div>
 //     </div>
-// {/* 
-//     <EditingBookingModal 
-//       isOpen={isEditModalOpen} 
-//       onClose={handleCloseModal} 
-//       booking={editingBooking} 
-//       onSave={handleSaveEdit} 
+// {/*
+//     <EditingBookingModal
+//       isOpen={isEditModalOpen}
+//       onClose={handleCloseModal}
+//       booking={editingBooking}
+//       onSave={handleSaveEdit}
 //     /> */}
 // {isAddBookingModalOpen && (
 //   <AddBooking
@@ -1299,13 +1296,12 @@
 
 // export default ScrollableAdminBookingTable;
 
-
-import React, { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
-import { fetchAllBookings } from '../firebase/services/bookingsData';
+import React, { useState, useEffect } from "react";
+import dayjs from "dayjs";
+import { fetchAllBookings } from "../firebase/services/bookingsData";
 
 const BookingsTable = ({ onTabChange }) => {
-  const [activeTab, setActiveTab] = useState('Amenities');
+  const [activeTab, setActiveTab] = useState("Amenities");
   const [bookings, setBookings] = useState([]);
   const [visibleBookings, setVisibleBookings] = useState([]);
 
@@ -1318,32 +1314,53 @@ const BookingsTable = ({ onTabChange }) => {
   }, []);
 
   const handleTabClick = (tab) => {
-    const newTab = tab === 'Amenities' ? 'Amenities' : 'Services';
+    const newTab = tab === "Amenities" ? "Amenities" : "Services";
     setActiveTab(newTab);
     onTabChange?.(newTab);
   };
 
-   // CSS to hide scrollbar but keep functionality
-   const hideScrollbarStyle = {
-    scrollbarWidth: 'none',  /* Firefox */
-    msOverflowStyle: 'none',  /* Internet Explorer 10+ */
-    '&::-webkit-scrollbar': { 
-      width: '0',
-      height: '0',
-      display: 'none'
-    }
+  // CSS to hide scrollbar but keep functionality
+  const hideScrollbarStyle = {
+    scrollbarWidth: "none" /* Firefox */,
+    msOverflowStyle: "none" /* Internet Explorer 10+ */,
+    "&::-webkit-scrollbar": {
+      width: "0",
+      height: "0",
+      display: "none",
+    },
   };
 
   const getAmenityStyle = (amenity) => {
-    switch(amenity?.toLowerCase()) {
-      case 'swimming pool':
-        return { backgroundColor: '#EFF6FF', color: '#1E40AF' };
-      case 'tennis court':
-        return { backgroundColor: '#F0FDF4', color: '#166534' };
-      case 'mini theater':
-        return { backgroundColor: '#FFF1F2', color: '#9F1239' };
+    switch (amenity?.toLowerCase()) {
+      case "gym":
+        return { backgroundColor: "#FFF1F2", color: "#9F1239" };
+      case "multi purpose court":
+        return { backgroundColor: "#F0FDF4", color: "#166534" };
+      case "banquet hall":
+        return { backgroundColor: "#FAF5FF", color: "#6B21A8" };
+      case "party hall":
+        return { backgroundColor: "#F7FEE7", color: "#65A30D" };
+      
+        case 'jacuzzi & spa':
+          return { backgroundColor: '#ECFEFF', color: '#155E75' };
+
+          case 'indoor theatre':
+            return { backgroundColor: '#FDF2F8', color: '#9D174D' };
+
+            case 'movie lawn':
+              return { backgroundColor: '#F0FDF4', color: '#9A3412' };
+
+              case 'table tennis room':
+                return { backgroundColor: '#FEFCE8', color: '#854D0E' };
+
+      case "swimming pool":
+        return { backgroundColor: "#EFF6FF", color: "#1E40AF" };
+      case "tennis court":
+        return { backgroundColor: "#F0FDF4", color: "#166534" };
+      case "mini theater":
+        return { backgroundColor: "#FFF1F2", color: "#9F1239" };
       default:
-        return { backgroundColor: '#F3F4F6', color: '#4B5563' };
+        return { backgroundColor: "#F3F4F6", color: "#4B5563" };
     }
   };
 
@@ -1352,21 +1369,22 @@ const BookingsTable = ({ onTabChange }) => {
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <h2 className="text-[16px] font-semibold mb-1">Recent Bookings</h2>
-        <p className="text-[12px] text-gray-500 mb-3 underline">View all your recent bookings</p>
-        
+        <p className="text-[12px] text-gray-500 mb-3 underline">
+          View all your recent bookings
+        </p>
+
         {/* Tabs */}
         <div className="flex gap-6 mt-6">
-          {['Amenities', 'Services'].map((tab) => (
+          {["Amenities", "Services"].map((tab) => (
             <span
               key={tab}
               onClick={() => handleTabClick(tab)}
-            
-            className={`relative cursor-pointer  pb-2 text-[12px] font-medium mb-1 ${
-              activeTab === tab
-              ? 'text-gray-900 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5  after:bg-gray-900 '
-               : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
+              className={`relative cursor-pointer  pb-2 text-[12px] font-medium mb-1 ${
+                activeTab === tab
+                  ? "text-gray-900 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5  after:bg-gray-900 "
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
               {tab}
             </span>
           ))}
@@ -1374,36 +1392,69 @@ const BookingsTable = ({ onTabChange }) => {
       </div>
 
       {/* Table with scroll */}
-      <div className="flex-1 relative"  style={hideScrollbarStyle}>
+      <div className="flex-1 relative" style={hideScrollbarStyle}>
         <table className="w-full border-collapse ">
           <thead className="bg-gray-50 sticky top-0">
             <tr className="border-y  border-gray-200">
-              <th className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium" style={{fontSize:'12px'}}>Name</th>
-              <th className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium" style={{fontSize:'12px'}}>Flat Number</th>
-              <th className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium" style={{fontSize:'12px'}}>Date</th>
-              <th className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium" style={{fontSize:'12px'}}>Amenities</th>
+              <th
+                className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium"
+                style={{ fontSize: "12px" }}
+              >
+                Name
+              </th>
+              <th
+                className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium"
+                style={{ fontSize: "12px" }}
+              >
+                Flat Number
+              </th>
+              <th
+                className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium"
+                style={{ fontSize: "12px" }}
+              >
+                Date
+              </th>
+              <th
+                className="text-left px-6 py-3 whitespace-nowrap text-md text-gray-500 font-medium"
+                style={{ fontSize: "12px" }}
+              >
+                Amenities
+              </th>
             </tr>
           </thead>
           <tbody>
             {bookings.map((booking, index) => {
-              const fullName = `${booking.userDetails?.firstName || ''} ${booking.userDetails?.lastName || ''}`.trim() || 'N/A';
+              const fullName =
+                `${booking.userDetails?.firstName || ""} ${
+                  booking.userDetails?.lastName || ""
+                }`.trim() || "N/A";
               return (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50 h-4">
-                  <td className="px-6  whitespace-nowrap py-4 text-md font-medium text-gray-900" style={{fontSize:'14px'}}>
+                <tr
+                  key={index}
+                  className="border-b border-gray-200 hover:bg-gray-50 h-4"
+                >
+                  <td
+                    className="px-6  whitespace-nowrap py-4 text-md font-medium text-gray-900"
+                    style={{ fontSize: "14px" }}
+                  >
                     {fullName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-md text-gray-500">
-                    {`${booking.userDetails?.wing || 'N/A'} - ${booking.userDetails?.flatNumber || 'N/A'}`}
+                    {`${booking.userDetails?.wing || "N/A"} - ${
+                      booking.userDetails?.flatNumber || "N/A"
+                    }`}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-md text-gray-500">
-                    {booking.date ? dayjs(booking.date.toDate()).format('D MMM, YYYY') : 'N/A'}
+                    {booking.date
+                      ? dayjs(booking.date.toDate()).format("D MMM, YYYY")
+                      : "N/A"}
                   </td>
                   <td className="px-6 py-4">
                     <span
                       className="inline-flex px-3 py-1 whitespace-nowrap text-medium font-medium rounded-xl"
                       style={getAmenityStyle(booking.amenityName)}
                     >
-                      {booking.amenityName || 'N/A'}
+                      {booking.amenityName || "N/A"}
                     </span>
                   </td>
                 </tr>

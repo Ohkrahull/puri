@@ -1,263 +1,4 @@
-// // import React from 'react';
-// // import { Outlet } from 'react-router-dom';
-// // import SideBar from './SideBar';
-// // import styles from './CustomScrollbar.module.css';
-
-// // const Layout = () => {
-// //   return (
-// //     <div className="flex h-screen overflow-hidden font-plus-jakarta" style={{ fontFamily: "Plus_Jakarta", background: 'var(--Gray-25, #F9FAFB)' }}>
-// //       {/* Left Sidebar (320px) */}
-// //       <div className="w-[320px] overflow-y-auto">
-// //         <SideBar />
-// //       </div>
-
-// //       {/* Main Content Area */}
-// //       <div className="flex-1 overflow-x-hidden overflow-y-auto">
-// //         <Outlet />
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // export default Layout;
-
-// // import React from 'react';
-// // import { Outlet, Link } from 'react-router-dom';
-// // import { Search, BellRing, HelpCircle, ChevronDown } from 'lucide-react';
-// // import SideBar from './SideBar';
-// // import styles from './CustomScrollbar.module.css';
-// // import { useAuth } from '../context/AuthContext';
-// // import Logo from "../Images/logo.png";
-// // import dashImag from '../Images/image 2.svg';
-
-// // const Layout = () => {
-// //   const { user } = useAuth();
-
-// //   return (
-// //     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-plus-jakarta">
-// //       {/* Sidebar */}
-// //       <div className="w-[320px] overflow-y-auto">
-// //         <SideBar />
-// //       </div>
-
-// //       {/* Main Content Area */}
-// //       <div className="flex-1 flex flex-col overflow-hidden">
-// //         {/* Header */}
-// //         <header className="bg-white border-b border-gray-100 h-[72px] flex items-center">
-// //           <div className="px-6 w-full">
-// //             <div className="flex items-center justify-between gap-4">
-// //               {/* Logo Section */}
-// //               <div className="flex items-center gap-2">
-// //                 <Link to="/" className="flex items-center">
-// //                   <img src={Logo} alt="Logo" className="h-14 w-14" />
-// //                   <img src={dashImag} alt="Dash" className="h-14 w-14" />
-// //                 </Link>
-// //               </div>
-
-// //               {/* Search Bar */}
-// //               <div className="flex-1 max-w-3xl">
-// //                 <div className="relative">
-// //                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-// //                   <input
-// //                     type="search"
-// //                     placeholder="Search"
-// //                     className="w-full h-10 pl-10 pr-12 rounded-lg border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-300 text-sm"
-// //                   />
-// //                   <kbd className="hidden sm:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-semibold text-gray-400 bg-gray-100 rounded">
-// //                     ctrl + k
-// //                   </kbd>
-// //                 </div>
-// //               </div>
-
-// //               {/* Right Section */}
-// //               <div className="flex items-center gap-6">
-// //                 {/* Help Icon */}
-// //                 <button className="p-2 hover:bg-gray-50 rounded-full">
-// //                   <HelpCircle className="h-5 w-5 text-gray-600" />
-// //                 </button>
-
-// //                 {/* Notification Icon */}
-// //                 <button className="p-2 hover:bg-gray-50 rounded-full relative">
-// //                   <BellRing className="h-5 w-5 text-gray-600" />
-// //                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-// //                 </button>
-
-// //                 {/* Profile Section */}
-// //                 <div className="flex items-center gap-2 cursor-pointer group">
-// //                   <div className="flex items-center gap-2">
-// //                     <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-// //                       <span className="text-white text-sm font-medium">
-// //                         {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-// //                       </span>
-// //                     </div>
-// //                     <div className="hidden md:block text-left">
-// //                       <p className="text-sm font-medium text-gray-700 line-clamp-1">
-// //                         {user?.firstName} {user?.lastName}
-// //                       </p>
-// //                       <p className="text-xs text-gray-500">
-// //                         {user?.roles?.admin ? 'Admin' : 
-// //                          user?.roles?.booking ? 'Booking Manager' : 
-// //                          user?.roles?.documents ? 'Legal Documents' : 
-// //                          user?.roles?.constructionUpdate ? 'Construction Update' : 
-// //                          'No Role'}
-// //                       </p>
-// //                     </div>
-// //                     <ChevronDown className="h-4 w-4 text-gray-500" />
-// //                   </div>
-// //                 </div>
-// //               </div>
-// //             </div>
-// //           </div>
-// //         </header>
-
-// //         {/* Main Content */}
-// //         <div className={`flex-1 overflow-y-auto ${styles.customScrollbar}`}>
-// //           <Outlet />
-// //         </div>
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // export default Layout;
-// // Layout.jsx
-
-
-// // import React from 'react';
-// // import { Outlet, Link } from 'react-router-dom';
-// // import { Search, BellRing, HelpCircle, ChevronDown, Menu } from 'lucide-react';
-// // import SideBar from './SideBar';
-// // import styles from './CustomScrollbar.module.css';
-// // import { useAuth } from '../context/AuthContext';
-// // import Logo from "../Images/logo.png";
-// // import dashImag from '../Images/image 2.svg';
-
-// // const Layout = () => {
-// //   const { user } = useAuth();
-// //   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-
-// //   return (
-// //     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden font-plus-jakarta">
-// //       {/* Sidebar */}
-// //       <div className="w-[320px] overflow-y-auto fixed h-full left-0 top-0 z-30 transform -translate-x-full sm:translate-x-0 transition-transform duration-300 ease-in-out">
-// //         <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-// //       </div>
-
-// //       {/* Main Content Area */}
-// //       <div className="flex-1 flex flex-col overflow-hidden sm:ml-[320px]">
-// //         {/* Header */}
-// //         <header className="bg-white border-b border-gray-100 h-[72px] flex items-center px-4">
-// //           <div className="w-full flex items-center justify-between gap-4">
-// //             {/* Left section with menu and logo */}
-// //             <div className="flex items-center gap-4">
-// //               <button
-// //                 onClick={() => setSidebarOpen(!sidebarOpen)}
-// //                 className="p-2 rounded-lg hover:bg-gray-100 sm:hidden"
-// //               >
-// //                 <Menu className="h-6 w-6 text-gray-500" />
-// //               </button>
-// //               <Link to="/" className="flex items-center gap-2">
-// //                 <img src={Logo} alt="Logo" className="h-14 w-14" />
-// //                 <img src={dashImag} alt="Dash" className="h-14 w-14" />
-// //               </Link>
-// //             </div>
-
-// //             {/* Search Bar */}
-// //             <div className="flex-1 max-w-3xl px-4">
-// //               <div className="relative">
-// //                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-// //                 <input
-// //                   type="search"
-// //                   placeholder="Search"
-// //                   className="w-full h-10 pl-10 pr-12 rounded-lg border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-300 text-sm"
-// //                 />
-// //                 <kbd className="hidden sm:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-semibold text-gray-400 bg-gray-100 rounded">
-// //                   ctrl + k
-// //                 </kbd>
-// //               </div>
-// //             </div>
-
-// //             {/* Right Section */}
-// //             <div className="flex items-center gap-4">
-// //               <button className="p-2 hover:bg-gray-50 rounded-full">
-// //                 <HelpCircle className="h-5 w-5 text-gray-600" />
-// //               </button>
-
-// //               <button className="p-2 hover:bg-gray-50 rounded-full relative">
-// //                 <BellRing className="h-5 w-5 text-gray-600" />
-// //                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-// //               </button>
-
-// //               <div className="flex items-center gap-2 cursor-pointer">
-// //                 <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-// //                   <span className="text-white text-sm font-medium">
-// //                     {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-// //                   </span>
-// //                 </div>
-// //                 <div className="hidden md:block text-left">
-// //                   <p className="text-sm font-medium text-gray-700">
-// //                     {user?.firstName} {user?.lastName}
-// //                   </p>
-// //                   <p className="text-xs text-gray-500">Admin</p>
-// //                 </div>
-// //                 <ChevronDown className="h-4 w-4 text-gray-500" />
-// //               </div>
-// //             </div>
-// //           </div>
-// //         </header>
-
-// //         {/* Main Content */}
-// //         <div className={`flex-1 overflow-y-auto ${styles.customScrollbar}`}>
-// //           <Outlet />
-// //         </div>
-// //       </div>
-
-// //       {/* Mobile Sidebar Overlay */}
-// //       {sidebarOpen && (
-// //         <div 
-// //           className="fixed inset-0 bg-black bg-opacity-50 z-20 sm:hidden"
-// //           onClick={() => setSidebarOpen(false)}
-// //         />
-// //       )}
-// //     </div>
-// //   );
-// // };
-
-// // export default Layout;
-// import React, { useState } from 'react';
-// import { Outlet } from 'react-router-dom';
-// // import Header from './Header';
-// import SideBar from './SideBar';
-// import styles from './CustomScrollbar.module.css';
-// import Header from './puriHeader';
-
-// const Layout = () => {
-//   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-//   return (
-//     <div className="min-h-screen bg-[#F9FAFB]" style={{ fontFamily: "Plus_Jakarta" }}>
-//       {/* Header - Full Width */}
-//       <Header />
-      
-//       {/* Main Content with Sidebar */}
-//       <div className="flex">
-//         {/* Sidebar */}
-//         <div className="fixed top-[72px] left-0">
-//           <SideBar />
-//         </div>
-
-//         {/* Main Content Area */}
-//         <div className="ml-[320px] flex-1 p-6">
-//           <Outlet />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Layout;
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Search, BellRing, HelpCircle, ChevronDown, Save, Loader } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -275,19 +16,241 @@ import { toast } from 'react-toastify';
 import GlobalSearch from './GlobalSearch';
 import GlobalSearchDropdown from './GlobalSearch';
 
+// Add new CSS style for dropdown animations
+const dropdownStyles = {
+  container: {
+    overflow: 'hidden'
+  },
+  content: {
+    transition: 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out',
+    opacity: 1
+  },
+  hidden: {
+    maxHeight: 0,
+    opacity: 0,
+    paddingTop: 0,
+    paddingBottom: 0
+  },
+  visible: {
+    maxHeight: '500px', // Adjust this to accommodate your largest dropdown
+    opacity: 1
+  }
+};
+
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  console.log("User Data", user);
+  
   const { isFormEditing, formDirty, setFormDirty,startSave , endSave, headerData } = useHeader();
-  const [visitorsOpen, setVisitorsOpen] = useState(false);
-  const [rentalOpen, setRentalOpen] = useState(false);
-  const [userOpen, setUserOpen] = useState(false);
+  // const [visitorsOpen, setVisitorsOpen] = useState(false);
+  // const [rentalOpen, setRentalOpen] = useState(false);
+  // const [userOpen, setUserOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const isOnFlatNoForm = location.pathname === '/FlatNoForm';
+  
+  const isHelperProfile = location.pathname.includes('/Helperprofile/'); // Match your exact path
+const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Check if we're editing
+  const isFormPath = isOnFlatNoForm || 
+    location.pathname.startsWith('/FlatNoForm/') || 
+    isHelperProfile;
+  
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  // Get current path
+  const currentPath = location.pathname;
+
+  // References for dropdown content elements to measure heights
+  const visitorsRef = useRef(null);
+  const rentalRef = useRef(null);
+  const userRef = useRef(null);
+
+    // Automatically determine which dropdowns should be open based on the current path
+    const [visitorsOpen, setVisitorsOpen] = useState(
+      currentPath.includes('/Guest') || 
+      currentPath.includes('/Helper') || 
+      currentPath.includes('/Delivery') || 
+      currentPath.includes('/Cab') || 
+      currentPath.includes('/Other')
+    );
+
+    const [rentalOpen, setRentalOpen] = useState(
+      currentPath.includes('/Owner') || 
+      currentPath.includes('/Tenant')
+    );
+
+    const [userOpen, setUserOpen] = useState(
+      currentPath.includes('/Resident') || 
+      currentPath.includes('/user') || 
+      currentPath.includes('/GuestLogin') || 
+      currentPath.includes('/AddGuard') || 
+      currentPath.includes('/AddHelper')
+    );
+
+    // Update dropdown states when route changes
+  useEffect(() => {
+    setVisitorsOpen(
+      currentPath.includes('/Guest') || 
+      currentPath.includes('/Helper') || 
+      currentPath.includes('/Delivery') || 
+      currentPath.includes('/Cab') || 
+      currentPath.includes('/Other')
+    );
+    
+    setRentalOpen(
+      currentPath.includes('/Owner') || 
+      currentPath.includes('/Tenant')
+    );
+    
+    setUserOpen(
+      currentPath.includes('/Resident') || 
+      currentPath.includes('/user') || 
+      currentPath.includes('/GuestLogin') || 
+      currentPath.includes('/AddGuard') || 
+      currentPath.includes('/AddHelper')
+    );
+  }, [currentPath]);
+
+   // Determine if user has access to a specific feature
+   const hasAccess = (featureName) => {
+    // If user is admin, they have access to everything
+    if (user?.roles?.admin) return true;
+    
+    // Otherwise, check if they have access to the specific feature
+    return user?.roles?.[featureName] === true;
+  };
+
+  // Get first accessible route for the user
+  const getFirstAccessibleRoute = () => {
+    if (hasAccess('dashboard')) return '/';
+    if (hasAccess('flatManagement')) return '/flatmain';
+    if (hasAccess('userRequests')) return '/UserRequests';
+    if (hasAccess('facility')) return '/Facility';
+    if (hasAccess('bookings')) return '/Booking';
+    if (hasAccess('visitors')) return '/Guest'; // First page in visitors section
+    if (hasAccess('parcels')) return '/Parcels';
+    if (hasAccess('notices')) return '/Notices';
+    if (hasAccess('sosHistory')) return '/sosHistory';
+    if (hasAccess('feedback')) return '/feedback';
+    if (hasAccess('specialRequest')) return '/special_request';
+    if (hasAccess('rentalRequest')) return '/Owner'; // First page in rental section
+    if (hasAccess('documents')) return '/document';
+    if (hasAccess('constructionUpdate')) return '/construction';
+    if (hasAccess('users')) return '/Resident'; // First page in users section
+    if (hasAccess('referrals')) return '/Referrals';
+    if (hasAccess('support')) return '/support';
+    
+    // If no specific access, return a default route
+    return '/'; // A dedicated page for users with no permissions
+  };
+
+   // Check if current path requires permissions, redirect if needed
+   useEffect(() => {
+    // Map of paths to their corresponding permission keys
+    const pathPermissions = {
+      '/': 'dashboard',
+      '/flatmain': 'flatManagement',
+      '/UserRequests': 'userRequests',
+      '/Facility': 'facility',
+      '/Booking': 'bookings',
+      '/Guest': 'visitors',
+      '/Helper': 'visitors',
+      '/Delivery': 'visitors',
+      '/Cab': 'visitors',
+      '/Other': 'visitors',
+      '/Parcels': 'parcels',
+      '/Notices': 'notices',
+      '/sosHistory': 'sosHistory',
+      '/feedback': 'feedback',
+      '/special_request': 'specialRequest',
+      '/Owner': 'rentalRequest',
+      '/Tenant': 'rentalRequest',
+      '/document': 'documents',
+      '/construction': 'constructionUpdate',
+      '/Resident': 'users',
+      '/user': 'users',
+      '/GuestLogin': 'users',
+      '/AddGuard': 'users',
+      '/AddHelper': 'users',
+      '/Referrals': 'referrals',
+      '/support': 'support'
+    };
+    
+    // Special case for home route
+    if (currentPath === '/') {
+      if (!hasAccess('dashboard')) {
+        navigate(getFirstAccessibleRoute());
+      }
+      return;
+    }
+    
+    // Find the base path for permission checking
+    // This handles nested routes by checking the base path
+    const basePath = Object.keys(pathPermissions).find(path => 
+      currentPath === path || (currentPath.startsWith(path) && path !== '/')
+    );
+    
+    if (basePath) {
+      const requiredPermission = pathPermissions[basePath];
+      if (!hasAccess(requiredPermission)) {
+        // User doesn't have access, redirect to first accessible route
+        navigate(getFirstAccessibleRoute());
+      }
+    }
+  }, [currentPath, user, navigate]);
+
+  // useEffect(() => {
+  //   const currentPath = location.pathname;
+    
+  //   // Map of paths to their corresponding permission keys
+  //   const pathPermissions = {
+  //     '/': 'dashboard',
+  //     '/flatmain': 'flatManagement',
+  //     '/UserRequests': 'userRequests',
+  //     '/Facility': 'facility',
+  //     '/Booking': 'bookings',
+  //     '/Guest': 'visitors',
+  //     '/Helper': 'visitors',
+  //     '/Delivery': 'visitors',
+  //     '/Cab': 'visitors',
+  //     '/Other': 'visitors',
+  //     '/Parcels': 'parcels',
+  //     '/Notices': 'notices',
+  //     '/sosHistory': 'sosHistory',
+  //     '/feedback': 'feedback',
+  //     '/special_request': 'specialRequest',
+  //     '/Owner': 'rentalRequest',
+  //     '/Tenant': 'rentalRequest',
+  //     '/document': 'documents',
+  //     '/construction': 'constructionUpdate',
+  //     '/Resident': 'users',
+  //     '/user': 'users',
+  //     '/GuestLogin': 'users',
+  //     '/AddGuard': 'users',
+  //     '/AddHelper': 'users',
+  //     '/Referrals': 'referrals',
+  //     '/support': 'support'
+  //   };
+    
+  //   // Special case for home route
+  //   if (currentPath === '/') {
+  //     if (!hasAccess('dashboard')) {
+  //       navigate(getFirstAccessibleRoute());
+  //     }
+  //     return;
+  //   }
+    
+  //   // For other routes, check if the user has access
+  //   const requiredPermission = pathPermissions[currentPath];
+  //   if (requiredPermission && !hasAccess(requiredPermission)) {
+  //     // User doesn't have access, redirect to first accessible route
+  //     navigate(getFirstAccessibleRoute());
+  //   }
+  // }, [location.pathname, user]);
+
+  // Check if a path is active -
 
 
   // Keyboard shortcut for search
@@ -306,8 +269,14 @@ const Layout = ({ children }) => {
   }, []);
 
   const isActive = (path) => {
-    return location.pathname === path ? "bg-gray-100" : "";
-  }
+    if (path === '/') {
+      // For home path, only exact match
+      return location.pathname === path ? "bg-gray-100" : "";
+    }
+    
+    // For other paths, check if current path starts with this path
+    return location.pathname.startsWith(path) ? "bg-gray-100" : "";
+  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -325,41 +294,91 @@ const Layout = ({ children }) => {
     setUserOpen(!userOpen);
   };
 
+  // const handleSave = async () => {
+  //   console.log('Save triggered'); // Debug log
+  //   const form = document.getElementById('owner-form');
+  //   if (!form) {
+  //     console.error('Form element not found');
+  //     return;
+  //   }
+  
+  //   startSave(); // Use context function
+  
+  //   const saveEvent = new CustomEvent('saveForm', {
+  //     bubbles: true,
+  //     detail: {
+  //       successCallback: () => {
+  //         endSave(true);
+  //         setFormDirty(false);
+  //         navigate('/flatmain');
+  //       },
+  //       errorCallback: () => {
+  //         endSave(false);
+  //         toast.error('Failed to save changes');
+  //       },
+  //       validationErrorCallback: () => {
+  //         endSave(false);
+  //       }
+  //     }
+  //   });
+  
+  //   form.dispatchEvent(saveEvent);
+  // };
+
   const handleSave = async () => {
-    console.log('Save triggered'); // Debug log
     const form = document.getElementById('owner-form');
     if (!form) {
       console.error('Form element not found');
       return;
     }
-  
-    startSave(); // Use context function
-  
+
+    setIsSaving(true);
+    startSave();
+
     const saveEvent = new CustomEvent('saveForm', {
       bubbles: true,
       detail: {
         successCallback: () => {
           endSave(true);
           setFormDirty(false);
-          navigate('/flatmain');
+          setIsSaving(false);
+          // Navigate based on current path
+          if (isHelperProfile) {
+            navigate('/AddHelper');
+          } else {
+            navigate('/flatmain');
+          }
         },
         errorCallback: () => {
           endSave(false);
+          setIsSaving(false);
           toast.error('Failed to save changes');
         },
         validationErrorCallback: () => {
           endSave(false);
+          setIsSaving(false);
         }
       }
     });
-  
+
     form.dispatchEvent(saveEvent);
   };
 
+  // const handleDiscard = () => {
+  //   if (window.confirm('Are you sure you want to discard changes? All unsaved changes will be lost.')) {
+  //     setFormDirty(false);
+  //     navigate('/flatmain');
+  //   }
+  // };
   const handleDiscard = () => {
     if (window.confirm('Are you sure you want to discard changes? All unsaved changes will be lost.')) {
       setFormDirty(false);
-      navigate('/flatmain');
+      // Navigate based on current path
+      if (isHelperProfile) {
+        navigate('/AddHelper');
+      } else {
+        navigate('/flatmain');
+      }
     }
   };
 
@@ -417,13 +436,14 @@ const Layout = ({ children }) => {
   //   );
   // };
   const renderSearchOrSave = () => {
-    const isFormPath = isOnFlatNoForm || location.pathname.startsWith('/FlatNoForm/');
+    // const isFormPath = isOnFlatNoForm || location.pathname.startsWith('/FlatNoForm/');
     const { getCurrentList, hasChanges, selectedUser, isAddingNew } = headerData;
+    const isInUpdateMode = isUpdateMode || (selectedUser && !isAddingNew);
   
     if (isFormPath && (isFormEditing || formDirty)) {
       return (
-        <div className="flex-1 max-w-4xl transition-all duration-300 ease-in-out transform" style={{ fontFamily: "Plus_Jakarta" }}>
-          <div className="relative w-full flex items-center gap-4 px-4 py-2 rounded-lg border border-gray-200 bg-gray-50">
+        <div className="flex-1 max-w-5xl transition-all duration-300 ease-in-out transform" style={{ fontFamily: "Plus_Jakarta" }}>
+          <div className="relative w-full flex items-center gap-4 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
             <WarningCircle size={24} className="text-gray-500" />
             <span className="text-[#333333] text-sm font-medium">Unsaved Changes</span>
             <div className="ml-auto flex items-center gap-3">
@@ -450,10 +470,12 @@ const Layout = ({ children }) => {
                   // </>
                   <div className="flex items-center justify-center">
                   <Loader className="animate-spin h-4 w-4 mr-2" />
-                  <span>{selectedUser && !isAddingNew ? 'Updating...' : 'Submitting...'}</span>
+                  <span>{isInUpdateMode ? 'Updating...' : 'Saving...'}</span>
+                  {/* <span>{selectedUser && !isAddingNew ? 'Updating...' : 'Submitting...'}</span> */}
                 </div>
                 ) : (
-                  <span>{selectedUser && !isAddingNew ? 'Update' : 'Submit'}</span>
+                  <span>{isInUpdateMode ? 'Update' : 'Save'}</span>
+                  // <span>{selectedUser && !isAddingNew ? 'Update' : 'Submit'}</span>
                   // selectedUser && !isAddingNew ? 'Update' : 'Submit'
                 )}
               </button>
@@ -465,48 +487,40 @@ const Layout = ({ children }) => {
   
     return (
       <GlobalSearchDropdown />
-      // <div className="flex-1 max-w-4xl transition-all duration-300 ease-in-out" style={{ fontFamily: "Plus_Jakarta" }}>
-      //   <div className="relative w-full">
-      //     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-      //     <input
-      //       type="search"
-      //       placeholder="Search"
-      //       className="w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
-      //     />
-      //     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-      //       <kbd className="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-gray-400 rounded">
-      //         ctrl + k
-      //       </kbd>
-      //     </div>
-      //   </div>
-      // </div>
-      // <div 
-      //   className="flex-1 max-w-4xl transition-all duration-300 ease-in-out cursor-pointer" 
-      //   style={{ fontFamily: "Plus_Jakarta" }}
-      //   onClick={() => setIsSearchOpen(true)}
-      // >
-      //   <div className="relative w-full">
-      //     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-      //     <input
-      //       type="search"
-      //       placeholder="Search"
-      //       className="w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-0 focus:border-gray-300"
-            
-      //     />
-      //     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-      //       <kbd className="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-gray-400 rounded">
-      //         ctrl + k
-      //       </kbd>
-      //     </div>
-      //   </div>
-      // </div>
-      // <div>
-      //   {isSearchOpen && (
-      //   <GlobalSearch onClose={() => setIsSearchOpen(false)} />
-      // )}
-      // </div>
+      
     );
   };
+
+   // Render a dropdown section with animation
+   const renderDropdownSection = (isOpen, toggleFunction, icon, title, children) => {
+    return (
+      <li>
+        <button
+          onClick={toggleFunction}
+          className="flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100"
+        >
+          <div className="flex items-center">
+            {icon}
+            <span className="ml-3 text-[16px] font-medium leading-6">{title}</span>
+          </div>
+          {isOpen ? (
+            <ChevronUp size={20} className="text-gray-500 transition-transform duration-300" />
+          ) : (
+            <ChevronDown size={20} className="text-gray-500 transition-transform duration-300" />
+          )}
+        </button>
+        <div style={{
+          ...dropdownStyles.container,
+          ...dropdownStyles.content,
+          ...(isOpen ? dropdownStyles.visible : dropdownStyles.hidden)
+        }}>
+          {children}
+        </div>
+      </li>
+    );
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "Plus_Jakarta" }}>
      
@@ -516,8 +530,8 @@ const Layout = ({ children }) => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
         <div className="h-[72px] px-6 flex items-center justify-between">
-          <div className="flex items-center gap-5 ml-2">
-            <Link to="/" className="flex items-center gap-5">
+          <div className="flex items-center gap-5 ml-2 mr-[80px]">
+            <Link  to={getFirstAccessibleRoute()} className="flex items-center gap-5">
               <div className="flex items-center gap-3">
                 <img src={Logo} alt="Puri Logo" className="h-13 w-13" />
                 <img src={dashImag} alt="Dashboard" className="h-13 w-13 -ml-1" />
@@ -529,9 +543,9 @@ const Layout = ({ children }) => {
             {renderSearchOrSave()}
 
             <div className="flex items-center gap-6">
-              <button className="p-2 hover:bg-gray-50 rounded-full">
+              {/* <button className="p-2 hover:bg-gray-50 rounded-full">
                 <HelpCircle color='#4b5563' size={24}/>
-              </button>
+              </button> */}
 
               <button 
   className="p-2 hover:bg-gray-50 rounded-full relative"
@@ -543,20 +557,7 @@ const Layout = ({ children }) => {
 
               <div className="h-8 border-l border-gray-200 mx-8"></div>
 
-              {/* <div className="flex items-center gap-5 cursor-pointer">
-                <div className="w-[36px] h-[36px] rounded-full bg-purple-500 flex items-center justify-center">
-                  <span className="text-white text-sm">
-                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                  </span>
-                </div>
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium text-gray-700 line-clamp-1">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <p className="text-xs text-gray-500">Admin</p>
-                </div>
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </div> */}
+              
               <ProfileDropdown 
     user={user} 
     onLogout={() => {
@@ -582,13 +583,13 @@ const Layout = ({ children }) => {
       </button>
 
       {/* Sidebar */}
-      <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] w-68 transition-transform ${
+      <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] min-w-[220px] transition-transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } sm:translate-x-0 bg-white border-r border-gray-100`}>
         <div className={`${styles.customScrollbar} flex flex-col h-full px-2 py-6 overflow-y-auto`}>
           <nav className="flex-grow list-none">
             {/* Admin Dashboard */}
-              {user?.roles?.admin && (
+            {hasAccess('dashboard') && (
                 <li>
                   <Link to='/' className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/')}`}>
                     <SquaresFour size={24} />
@@ -598,43 +599,96 @@ const Layout = ({ children }) => {
               )}
 
               {/* Flat Management */}
+              {hasAccess('flatManagement') && (
               <li>
                 <Link to="/flatmain" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/flatmain')}`}>
                   <Buildings size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Flat Management</span>
                 </Link>
               </li>
+              )}
 
               {/* User Requests */}
+              {hasAccess('userRequests') && (
+
+              
               <li>
                 <Link to="/UserRequests" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/UserRequests')}`}>
                   <UserCirclePlus size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">User Requests</span>
                 </Link>
               </li>
+              )}
 
               {/* Facility */}
+              {hasAccess("facility") &&(
+
+             
               <li>
                 <Link to="/Facility" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Facility')}`}>
                   <Buildings size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Facility</span>
                 </Link>
               </li>
+               )}
 
               {/* Bookings */}
+              {hasAccess('bookings') && (
               <li>
                 <Link to="/Booking" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Booking')}`}>
                   <CalendarDots size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Bookings</span>
                 </Link>
               </li>
+              )}
 
+{hasAccess('visitors') && renderDropdownSection(
+              visitorsOpen,
+              toggleVisitors,
+              <UserList size={24} />,
+              "Visitors",
+              <ul className="pl-10 mt-2 space-y-2">
+                <li>
+                  <Link to="/Guest" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Guest')}`}>
+                    <span className="text-[14px] font-medium">Guest</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/Helper" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Helper')}`}>
+                    <span className="text-[14px] font-medium">Helper</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/Delivery" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Delivery')}`}>
+                    <span className="text-[14px] font-medium">Delivery</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/Cab" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Cab')}`}>
+                    <span className="text-[14px] font-medium">Cab</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/Other" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Other')}`}>
+                    <span className="text-[14px] font-medium">Other</span>
+                  </Link>
+                </li>
+              </ul>
+            )}
               {/* Visitors Section */}
-              <li>
-                <button
+              {/* {hasAccess('visitors') && (
+              <li> */}
+                 {/* <button
+                  onClick={toggleVisitors}
+                  className={`flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${
+                    isActive('/Guest') || isActive('/Helper') || isActive('/Delivery') || isActive('/Cab') || isActive('/Other') ? "bg-gray-100" : ""
+                  }`}
+                > */}
+                {/* <button
                   onClick={toggleVisitors}
                   className="flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100"
                 >
+
                   <div className="flex items-center">
                     <UserList size={24} />
                     <span className="ml-3 text-[16px] font-medium leading-6">Visitors</span>
@@ -675,8 +729,10 @@ const Layout = ({ children }) => {
                   </ul>
                 )}
               </li>
+              )} */}
 
               {/* Parcels */}
+              {hasAccess('parcels') && (
               <li>
                 <Link to="/Parcels" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Parcels')}`}>
                   <Package size={24} />
@@ -684,41 +740,57 @@ const Layout = ({ children }) => {
                 </Link>
               </li>
 
+              )}
               {/* Notices */}
+              {hasAccess('notices') && (
               <li>
                 <Link to="/Notices" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Notices')}`}>
                   <Megaphone size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Notices</span>
                 </Link>
               </li>
+              )}
 
               {/* SOS History */}
+              {hasAccess('sosHistory') && (
               <li>
                 <Link to="/sosHistory" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/sosHistory')}`}>
                   <Siren size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">SOS History</span>
                 </Link>
               </li>
+              )}
 
               {/* Feedback */}
+              {hasAccess('feedback') && (
               <li>
                 <Link to="/feedback" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/feedback')}`}>
                   <ChatText size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Feedback</span>
                 </Link>
               </li>
+              )}
 
               {/* Special Request */}
+              {hasAccess('specialRequest') && (
               <li>
                 <Link to="/special_request" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/special_request')}`}>
                   <NotePencil size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Special Request</span>
                 </Link>
               </li>
+              )}
 
               {/* Rental Request Section */}
-              <li>
-                <button
+              {/* {hasAccess('rentalRequest') && (
+              <li> */}
+                {/* <button
+                  onClick={toggleRental}
+                  className={`flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${
+                    isActive('/Owner') || isActive('/Tenant') ? "bg-gray-100" : ""
+                  }`}
+                > */}
+                {/* <button
                   onClick={toggleRental}
                   className="flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100"
                 >
@@ -747,26 +819,57 @@ const Layout = ({ children }) => {
                   </ul>
                 )}
               </li>
+              )} */}
+               {/* Rental Request Section - With Animation */}
+            {hasAccess('rentalRequest') && renderDropdownSection(
+              rentalOpen,
+              toggleRental,
+              <NotePencil size={24} />,
+              "Rental Request",
+              <ul className="pl-10 mt-2 space-y-2">
+                <li>
+                  <Link to="/Owner" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Owner')}`}>
+                    <span className="text-[14px] font-medium">Owner</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/Tenant" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Tenant')}`}>
+                    <span className="text-[14px] font-medium">Tenant</span>
+                  </Link>
+                </li>
+              </ul>
+            )}
 
               {/* Documents */}
+              {hasAccess('documents') && (
               <li>
                 <Link to="/document" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/document')}`}>
                   <Files size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Documents</span>
                 </Link>
               </li>
+              )}
 
               {/* Construction Update */}
+              {hasAccess('constructionUpdate') && (
               <li>
                 <Link to="/construction" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/construction')}`}>
                   <ArrowsClockwise size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Construction Update</span>
                 </Link>
               </li>
+              )}
 
               {/* Users Section */}
-              <li>
-                <button
+              {/* {hasAccess('users') && (
+              <li> */}
+                {/* <button
+                  onClick={toggleUser}
+                  className={`flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${
+                    isActive('/Resident') || isActive('/user') || isActive('/GuestLogin') || isActive('/AddGuard') || isActive('/AddHelper') ? "bg-gray-100" : ""
+                  }`}
+                > */}
+                {/* <button
                   onClick={toggleUser}
                   className="flex items-center justify-between w-full ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100"
                 >
@@ -810,14 +913,52 @@ const Layout = ({ children }) => {
                   </ul>
                 )}
               </li>
+              )} */}
+              {hasAccess('users') && renderDropdownSection(
+              userOpen,
+              toggleUser,
+              <UserCircle size={24} />,
+              "Users",
+              <ul className="pl-10 mt-2 space-y-2">
+                <li>
+                  <Link to="/Resident" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Resident')}`}>
+                    <span className="text-[14px] font-medium">Resident</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/user" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/user')}`}>
+                    <span className="text-[14px] font-medium">Staff</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/GuestLogin" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/GuestLogin')}`}>
+                    <span className="text-[14px] font-medium">Guest Login</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/AddGuard" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/AddGuard')}`}>
+                    <span className="text-[14px] font-medium">Guard</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/AddHelper" className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/AddHelper')}`}>
+                    <span className="text-[14px] font-medium">Helper</span>
+                  </Link>
+                </li>
+              </ul>
+            )}
 
               {/* Referrals */}
+              {hasAccess('referrals') && (
               <li>
                 <Link to="/Referrals" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/Referrals')}`}>
                   <Gift size={24} />
                   <span className="ml-3 text-[16px] font-medium leading-6">Referrals</span>
                 </Link>
               </li>
+              )}
+
+{hasAccess('support') && (
               <li>
                 <Link to="/support" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/support')}`}>
                   {/* <Gift size={24} /> */}
@@ -825,15 +966,9 @@ const Layout = ({ children }) => {
                   <span className="ml-3 text-[16px] font-medium leading-6">Support</span>
                 </Link>
               </li>
+)}
 
-              {/* Support */}
-              {/* <li>
-                <Link to="/support" className={`flex items-center ml-2 p-3 text-gray-600 rounded-lg hover:bg-gray-100 ${isActive('/support')}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2.25C10.0716 2.25 8.18657 2.82183 6.58319 3.89317C4.97982 4.96451 3.73013 6.48726 2.99218 8.26884C2.25422 10.0504 2.06114 12.0108 2.43735 13.9021C2.81355 15.7934 3.74215 17.5307 5.10571 18.8943C6.46928 20.2579 8.20656 21.1865 10.0979 21.5627C11.9892 21.9389 13.9496 21.7458 15.7312 21.0078C17.5127 20.2699 19.0355 19.0202 20.1068 17.4168C21.1782 15.8134 21.75 13.9284 21.75 12C21.7473 9.41498 20.7192 6.93661 18.8913 5.10872C17.0634 3.28084 14.585 2.25273 12 2.25ZM15.6656 14.6053C16.2083 13.8449 16.4999 12.9341 16.4999 12C16.4999 11.0659 16.2083 10.155 15.6656 9.39469L18.3375 6.72375C19.5732 8.20427 20.2501 10.0715 20.2501 12C20.2501 13.9285 19.5732 15.7957 18.3375 17.2762L15.6656 14.6053ZM9 12C9 11.4067 9.17595 10.8266 9.5056 10.3333C9.83524 9.83994 10.3038 9.45542 10.852 9.22836C11.4001 9.0013 12.0033 8.94189 12.5853 9.05764C13.1672 9.1734 13.7018 9.45912 14.1213 9.87868C14.5409 10.2 />
-        
-         </Link>
-         </li> */}
+              
         </nav>
         </div>
       </aside>

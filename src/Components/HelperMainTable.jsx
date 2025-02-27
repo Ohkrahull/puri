@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import DeleteModal from '../Modals/DeleteModal';
 import SortButton from '../Buttons/Sortdate';
 import StatusBadge from './StatusBadge';
+import { useImageViewer } from '../context/ImageViewerContext';
 
 // // Confirmation Dialog Component
 // const ConfirmationDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
@@ -230,179 +231,7 @@ const FlatNumberDisplay = ({ flatNumbers }) => {
       </div>
     );
   };
-// Updated Status Badge Component
-// const StatusBadge = ({ status, helper }) => {
-//     const [isOpen, setIsOpen] = useState(false);
-//     const [showConfirmation, setShowConfirmation] = useState(false);
-//     const [pendingStatus, setPendingStatus] = useState(null);
-//     const db = getFirestore(getApp());
-  
-//     const getStatusStyle = () => {
-//       switch(status?.toLowerCase()) {
-//         case 'approved':
-//           return 'bg-green-50 text-green-700';
-//         case 'pending':
-//           return 'bg-yellow-50 text-yellow-700';
-//         case 'rejected':
-//           return 'bg-red-50 text-red-700';
-//         default:
-//           return 'bg-gray-50 text-gray-700';
-//       }
-//     };
-  
-//     const getDotColor = () => {
-//       switch(status?.toLowerCase()) {
-//         case 'approved':
-//           return 'bg-green-600';
-//         case 'pending':
-//           return 'bg-yellow-600';
-//         case 'rejected':
-//           return 'bg-red-600';
-//         default:
-//           return 'bg-gray-600';
-//       }
-//     };
-//     const getAvailableStatuses = () => {
-//         switch(status?.toLowerCase()) {
-//           case 'pending':
-//             return ['approved', 'rejected'];
-//           case 'approved':
-//             return ['pending', 'rejected'];
-//           case 'rejected':
-//             return ['pending', 'approved'];
-//           default:
-//             return [];
-//         }
-//       };
 
-
-//       const getConfirmationMessage = (newStatus) => {
-//         const name = `${helper.firstName} ${helper.lastName}`;
-//         switch(newStatus) {
-//           case 'approved':
-//             return {
-//               title: 'Approve Helper',
-//               message: `Are you sure you want to approve ${name}? This will generate a new ticket ID.`
-//             };
-//           case 'rejected':
-//             return {
-//               title: 'Reject Helper',
-//               message: `Are you sure you want to reject ${name}? This will remove their ticket ID.`
-//             };
-//           case 'pending':
-//             return {
-//               title: 'Move to Pending',
-//               message: `Are you sure you want to move ${name} to pending status? ${
-//                 status === 'approved' ? 'This will remove their ticket ID.' : ''
-//               }`
-//             };
-//           default:
-//             return {
-//               title: 'Change Status',
-//               message: `Are you sure you want to change the status for ${name}?`
-//             };
-//         }
-//       };
-//       const handleStatusClick = (e) => {
-//         e.stopPropagation();
-//         if (getAvailableStatuses().length > 0) {
-//           setIsOpen(!isOpen);
-//         }
-//       };
-
-//       const initiateStatusChange = (newStatus) => {
-//         setIsOpen(false);
-//         setPendingStatus(newStatus);
-//         setShowConfirmation(true);
-//       };
-    
-//       const handleStatusChange = async (newStatus) => {
-//         try {
-//           const helperRef = doc(db, "helpers", helper.id);
-//           let updateData = { status: newStatus };
-    
-//           // Handle ticketId based on status transition
-//           if (newStatus === 'approved') {
-//             if (status === 'pending' || !helper.ticketId) {
-//               const ticketId = await generateTicketId(db);
-//               updateData.ticketId = ticketId;
-//             }
-//           } else if (newStatus === 'pending' && status === 'approved') {
-//             updateData.ticketId = '';
-//           } else if (newStatus === 'rejected') {
-//             updateData.ticketId = '';
-//           }
-    
-//           await updateDoc(helperRef, updateData);
-//           toast.success(`Status updated to ${newStatus}`);
-          
-//           if (updateData.ticketId) {
-//             toast.success(`New ticket ID generated: ${updateData.ticketId}`);
-//           }
-//         } catch (error) {
-//           console.error("Error updating status:", error);
-//           toast.error("Failed to update status");
-//         }
-//         setShowConfirmation(false);
-//       };
-
-//   return (
-//     <>
-//       <div className="relative">
-//         <div 
-//           className={`flex items-center gap-1.5 px-3 py-1 rounded-full w-fit ${getStatusStyle()} cursor-pointer`}
-//           onClick={handleStatusClick}
-//         >
-//           <span className={`h-1.5 w-1.5 rounded-full ${getDotColor()}`} />
-//           <span className="text-sm font-medium">
-//             {status?.charAt(0).toUpperCase() + status?.slice(1).toLowerCase()}
-//           </span>
-//           {getAvailableStatuses().length > 0 && (
-//             <svg 
-//               xmlns="http://www.w3.org/2000/svg" 
-//               width="14" 
-//               height="14" 
-//               viewBox="0 0 24 24" 
-//               fill="none" 
-//               stroke="currentColor" 
-//               strokeWidth="2" 
-//               strokeLinecap="round" 
-//               strokeLinejoin="round"
-//               className={`transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
-//             >
-//               <polyline points="6 9 12 15 18 9"></polyline>
-//             </svg>
-//           )}
-//         </div>
-        
-//         {isOpen && (
-//           <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 py-1 min-w-[100px]">
-//             {getAvailableStatuses().map((newStatus) => (
-//               <div
-//                 key={newStatus}
-//                 className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm capitalize"
-//                 onClick={() => initiateStatusChange(newStatus)}
-//               >
-//                 {newStatus}
-//               </div>
-//             ))}
-//           </div>
-//         )}
-//       </div>
-
-//       {showConfirmation && pendingStatus && (
-//         <ConfirmationDialog
-//           isOpen={showConfirmation}
-//           onClose={() => setShowConfirmation(false)}
-//           onConfirm={() => handleStatusChange(pendingStatus)}
-//           {...getConfirmationMessage(pendingStatus)}
-//         />
-//       )}
-//     </>
-//   );
-// };
-
-// Main HelperTable component
 const HelperTable = () => {
   const [helpers, setHelpers] = useState([]);
   const [filteredHelpers, setFilteredHelpers] = useState([]);
@@ -413,6 +242,7 @@ const HelperTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteItemName, setDeleteItemName] = useState('');
   const [deleteFunction, setDeleteFunction] = useState(null);
+  const { openImageViewer } = useImageViewer();
 
   const navigate = useNavigate();
   const db = getFirestore(getApp());
@@ -631,15 +461,34 @@ const HelperTable = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0">
-                        <img 
-                          className="h-10 w-10 rounded-full object-cover"
-                          src={helper.imageUrl || '/placeholder.jpg'}
-                          alt=""
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/Images/profile.png';
-                          }}
-                        />
+                      <div className="relative group">
+                <img 
+                  src={helper.imageUrl} 
+                  alt={`${helper.firstName || ''} ${helper.lastName || ''}`}
+                  className="w-10 h-10 rounded-full object-cover cursor-zoom-in transition-all duration-200 group-hover:ring-2 group-hover:ring-blue-500"
+                  // onClick={() => openImageViewer(
+                  //   helper.imageUrl,
+                  //   `${helper.firstName || ''} ${helper.lastName || ''}`
+                  // )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openImageViewer(
+                      helper.imageUrl,
+                      `${helper.firstName || ''} ${helper.lastName || ''}`
+                    );
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/Images/profile.png';
+                  }}
+                />
+                <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                  Click to view
+                </div>
+              </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900" style={{fontSize:'14px'}}>

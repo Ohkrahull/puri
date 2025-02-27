@@ -172,16 +172,56 @@ export const addNewAuthorizedUser = async (phoneNumber, firstName, lastName, ema
   }
 };
 
+// export const getAllAuthorizedUsers = async () => {
+//   try {
+//     const usersRef = collection(db, AUTHORIZED_USERS_COLLECTION);
+//     const q = query(usersRef, orderBy('addedAt', 'desc'));
+//     const snapshot = await getDocs(q);
+//     return snapshot.docs.map((doc) => ({
+//       id: doc.id,
+//       ...doc.data(),
+//       addedAt: doc.data().addedAt?.toDate() // Convert Firestore Timestamp to JavaScript Date
+//     }));
+//   } catch (error) {
+//     console.error('Error getting all authorized users:', error);
+//     throw error;
+//   }
+// };
 export const getAllAuthorizedUsers = async () => {
   try {
     const usersRef = collection(db, AUTHORIZED_USERS_COLLECTION);
     const q = query(usersRef, orderBy('addedAt', 'desc'));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      addedAt: doc.data().addedAt?.toDate() // Convert Firestore Timestamp to JavaScript Date
-    }));
+    
+    // Array to hold expanded users (one entry per flat)
+    const expandedUsers = [];
+    
+    snapshot.docs.forEach((doc) => {
+      const userData = doc.data();
+      const baseUser = {
+        id: doc.id,
+        ...userData,
+        addedAt: userData.addedAt?.toDate() // Convert Firestore Timestamp to JavaScript Date
+      };
+      
+      // Check if user has approved flats
+      if (userData.flats && userData.flats.approved && userData.flats.approved.length > 0) {
+        // Create a separate entry for each flat
+        userData.flats.approved.forEach(flat => {
+          expandedUsers.push({
+            ...baseUser,
+            wing: flat.wing,
+            flatNumber: flat.flatNumber,
+            flatId: flat.flatId
+          });
+        });
+      } else {
+        // For users without explicit flats, add them with their default flat info
+        expandedUsers.push(baseUser);
+      }
+    });
+    
+    return expandedUsers;
   } catch (error) {
     console.error('Error getting all authorized users:', error);
     throw error;

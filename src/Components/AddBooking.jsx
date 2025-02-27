@@ -563,6 +563,7 @@ const availableSlots = generateTimeSlots(
       userId: selectedUser.id,
       userFirstName: selectedUser.firstName,
       userLastName: selectedUser.lastName,
+      
     };
 
     if (isEditing) {

@@ -4,6 +4,7 @@ import "../App.css";
 import "../index.css";
 import SpecialReqTable from "./SpecialReqtable";
 import ExportModal from "./specialReqExport";
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 
 const SpecialRequest = () => {
     const [showExportModal, setShowExportModal] = useState(false);
@@ -49,7 +50,7 @@ const SpecialRequest = () => {
             justifyItems: "flex-end",
           }}
         >
-          <button
+          {/* <button
             onClick={() => setShowExportModal(true)}
             style={{
               display: "flex",
@@ -69,7 +70,14 @@ const SpecialRequest = () => {
               </svg>
             </span>
             Export
-          </button>
+          </button> */}
+          <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
         </div>
       </div>
 

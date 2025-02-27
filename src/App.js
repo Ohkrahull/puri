@@ -50,6 +50,11 @@ import HelperUser from './Components/HelperUser';
 import AddHelperForm from './Components/AddHelper';
 import GuardUser from './Components/GuardUser';
 import AddGuardForm from './Components/AddGuard';
+import TenantMain from './Components/TenantMain';
+import OwnerMain from './Components/OwnerMain';
+import OwnerDetailsView from './Components/OwnerReqDetails';
+import TenantDetails from './Components/TenantDetails';
+import UserRequestView from './Components/UserRequestView';
 
 // Custom Loader component
 const Loader = () => {
@@ -208,6 +213,7 @@ function App() {
           <Route path="/flatmain" element={<Flatmain />} />
           <Route path="/FlatNoform" element={<FlatNoform />} />
           <Route path="/FlatNoForm/:flatId" element={<FlatNoform />} />
+          <Route path="/FlatNoForm/:flatId/:userId" element={<FlatNoform />} />
           <Route path="/sosHistory" element={<SosMain />} />
           <Route path="/Facility" element={<Facility />} />
           <Route path="/Amenityform" element={<AmenityDetailsForm />} />
@@ -222,7 +228,12 @@ function App() {
           <Route path="/Notices" element={<NoticesMain />} />
           <Route path="/Noticeform" element={<NoticeForm />} />
           <Route path="/UserRequests" element={<UserRequestMain />} />
+          <Route path="/UserRequests/:id" element={<UserRequestView />} />
           <Route path="/Resident" element={<ResidentMain />} />
+          <Route path="/Tenant" element={<TenantMain />} />
+          <Route path="/Tenant/:id" element={<TenantDetails />} />
+          <Route path="/Owner" element={<OwnerMain />} />
+          <Route path="/Owner/:id" element={<OwnerDetailsView />} />
           <Route path="/GuestLogin" element={<GuestLogin />} />
           <Route path="/AddHelper" element={<HelperUser />} />
           <Route path="/AddNewHelper" element={<AddHelperForm />} />

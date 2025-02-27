@@ -3,8 +3,9 @@ import styles from './CustomScrollbar.module.css';
 import "../App.css";
 import "../index.css";
 import SupportTable from "../Tables/Support";
-import ExportModal from "./SupportExport";
+import ExportModal from "./Exports/support";
 import { getAllSupportDocuments } from '../firebase/services/support';
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 
 const Support = () => {
   const [showExportModal, setShowExportModal] = useState(false);
@@ -25,7 +26,7 @@ const Support = () => {
           </p>
         </div>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", justifyItems: "flex-end" }}>
-          <button
+          {/* <button
             onClick={() => setShowExportModal(true)}
             style={{
               display: "flex",
@@ -45,7 +46,14 @@ const Support = () => {
               </svg>
             </span>
             Export
-          </button>
+          </button> */}
+           <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon/>
+  Export
+</HighlightButton>
         </div>
       </div>
 

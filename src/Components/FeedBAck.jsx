@@ -6,6 +6,7 @@ import FeedBackTableNew from "./FeedBackTableNew";
 import FeedbackEnter from "./FeedbackEnter";
 import { toast } from 'react-toastify';
 import ExportModal from "./exportFeedback";
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 
 const FeedBackMain = () => {
     const [activeTab] = useState("Feedback");
@@ -62,7 +63,7 @@ const FeedBackMain = () => {
               justifyItems: "flex-end",
             }}
           >
-            <button
+            {/* <button
               onClick={() => setShowExportModal(true)}
               style={{
                 display: "flex",
@@ -82,7 +83,14 @@ const FeedBackMain = () => {
                 </svg>
               </span>
               Export
-            </button>
+            </button> */}
+            <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
           </div>
         </div>
 

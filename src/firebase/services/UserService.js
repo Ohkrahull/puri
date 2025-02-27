@@ -89,9 +89,77 @@ const MEMBER_COLLECTION = 'authorizedUsers';
 //   }
 // };
 
+// export const addStaffUser = async (userData) => {
+//   console.log('Creating user:', userData);
+//   const { email, password, role, firstName, lastName, phoneNumber, employeeId } = userData;
+//   console.log(userData);
+  
+
+//   try {
+//     // Check if email already exists in either collection
+//     const emailExists = await checkIfEmailExists(email);
+    
+//     if (emailExists) {
+//       console.log("This email is already registered. Please use a different email address.");
+      
+//       throw new Error("This email is already registered. Please use a different email address.");
+//     }
+    
+//     // Create user in Firebase Authentication
+//     const response = await axios.post('https://puri-dashboard-server.onrender.com/api/create-user', {
+//       email,
+//       password,
+//       firstName,
+//       lastName,
+//       role,
+//       phoneNumber,
+//       employeeId
+//     });
+
+//     const authUID = response.data.userId; // Get the auth UID from the response
+
+//     // Prepare user data for Firestore
+//     const userRef = doc(collection(db, COLLECTION_NAME));
+//     const firestoreData = {
+//       email,
+//       phoneNumber,
+//       employeeId,
+//       firstName,
+//       lastName,
+//       authUID,
+//       roles: {
+//         admin: role === 'Admin',
+//         booking: role === 'Booking Manager',
+//         documents: role === 'Legal Documents',
+//         constructionUpdate: role === 'Construction Update'
+//       },
+//       addedAt: serverTimestamp(),
+//       lastLogin: null
+//     };
+
+//     // Add user to Firestore
+//     await setDoc(userRef, firestoreData);
+
+//     console.log('User created:', { firestoreId: userRef.id, authUID });
+
+//     return { 
+//       firestoreId: userRef.id, 
+//       authUID,
+//       ...firestoreData
+//     };
+//   } catch (error) {
+//     console.error('Error creating user:', error);
+//     if (error.response && error.response.data) {
+//       throw new Error(error.response.data.details || 'Failed to add staff user');
+//     } else {
+//       throw error;
+//     }
+//   }
+// };
+
 export const addStaffUser = async (userData) => {
   console.log('Creating user:', userData);
-  const { email, password, role, firstName, lastName, phoneNumber, employeeId } = userData;
+  const { email, password, roles, firstName, lastName, phoneNumber, employeeId } = userData;
 
   try {
     // Check if email already exists in either collection
@@ -99,24 +167,35 @@ export const addStaffUser = async (userData) => {
     
     if (emailExists) {
       console.log("This email is already registered. Please use a different email address.");
-      
       throw new Error("This email is already registered. Please use a different email address.");
     }
     
-    // Create user in Firebase Authentication
+    // Determine primary role for the API call (needed because the API expects a single role)
+    let primaryRole = 'Staff';
+    if (roles.admin) {
+      primaryRole = 'Admin';
+    } else if (roles.bookings) {
+      primaryRole = 'Booking Manager';
+    } else if (roles.documents) {
+      primaryRole = 'Legal Documents';
+    } else if (roles.constructionUpdate) {
+      primaryRole = 'Construction Update';
+    }
+    
+    // Create user in Firebase Authentication via API
     const response = await axios.post('https://puri-dashboard-server.onrender.com/api/create-user', {
       email,
       password,
       firstName,
       lastName,
-      role,
+      role: primaryRole, // API still expects a single role
       phoneNumber,
       employeeId
     });
 
     const authUID = response.data.userId; // Get the auth UID from the response
 
-    // Prepare user data for Firestore
+    // Prepare user data for Firestore with the complete roles object
     const userRef = doc(collection(db, COLLECTION_NAME));
     const firestoreData = {
       email,
@@ -125,11 +204,26 @@ export const addStaffUser = async (userData) => {
       firstName,
       lastName,
       authUID,
+      // Store the full roles object with all permissions
       roles: {
-        admin: role === 'Admin',
-        booking: role === 'Booking Manager',
-        documents: role === 'Legal Documents',
-        constructionUpdate: role === 'Construction Update'
+        admin: roles.admin || false,
+        dashboard: roles.dashboard || false,
+        flatManagement: roles.flatManagement || false,
+        userRequests: roles.userRequests || false,
+        facility: roles.facility || false,
+        bookings: roles.bookings || false,
+        visitors: roles.visitors || false,
+        parcels: roles.parcels || false,
+        notices: roles.notices || false,
+        sosHistory: roles.sosHistory || false,
+        feedback: roles.feedback || false,
+        specialRequest: roles.specialRequest || false,
+        rentalRequest: roles.rentalRequest || false,
+        documents: roles.documents || false,
+        constructionUpdate: roles.constructionUpdate || false,
+        users: roles.users || false,
+        referrals: roles.referrals || false,
+        support: roles.support || false
       },
       addedAt: serverTimestamp(),
       lastLogin: null
@@ -154,7 +248,6 @@ export const addStaffUser = async (userData) => {
     }
   }
 };
-
 
 export const checkIfEmailExists = async (email) => {
   const staffQuery = query(collection(db, COLLECTION_NAME), where("email", "==", email));
@@ -194,6 +287,21 @@ export const updateStaffUser = async (uid, updates) => {
     if (updates.email) authUpdates.email = updates.email;
     if (updates.password) authUpdates.password = updates.password;
 
+    // Determine primary role if needed for auth update
+    if (updates.roles) {
+      let primaryRole = 'Staff';
+      if (updates.roles.admin) {
+        primaryRole = 'Admin';
+      } else if (updates.roles.bookings) {
+        primaryRole = 'Booking Manager';
+      } else if (updates.roles.documents) {
+        primaryRole = 'Legal Documents';
+      } else if (updates.roles.constructionUpdate) {
+        primaryRole = 'Construction Update';
+      }
+      authUpdates.role = primaryRole;
+    }
+
     if (Object.keys(authUpdates).length > 0) {
       const response = await axios.post('https://puri-dashboard-server.onrender.com/api/update-auth', {
         uid,
@@ -206,10 +314,8 @@ export const updateStaffUser = async (uid, updates) => {
 
       if (response.status === 200) {
         authUpdateSuccess = true;
-        
         console.log('Authentication updated successfully');
       } else {
-        
         throw new Error(response.data.error || 'Failed to update auth credentials');
       }
     } else {
@@ -231,14 +337,7 @@ export const updateStaffUser = async (uid, updates) => {
     const dbUpdates = { ...updates, authUID: uid };
     delete dbUpdates.password; // Don't store password in Firestore
     
-    if (dbUpdates.roles) {
-      dbUpdates.roles = {
-        admin: dbUpdates.roles.includes('admin'),
-        booking: dbUpdates.roles.includes('booking'),
-        documents: dbUpdates.roles.includes('documents'),
-        constructionUpdate: dbUpdates.roles.includes('constructionUpdate')
-      };
-    }
+    // No need to transform roles - they're already in the correct format
 
     await setDoc(userRef, dbUpdates, { merge: true });
     firestoreUpdateSuccess = true;
@@ -258,6 +357,84 @@ export const updateStaffUser = async (uid, updates) => {
     };
   }
 };
+// export const updateStaffUser = async (uid, updates) => {
+//   if (!uid || typeof uid !== 'string' || uid.length > 128) {
+//     throw new Error('Invalid user UID provided');
+//   }
+
+//   let authUpdateSuccess = false;
+//   let firestoreUpdateSuccess = false;
+
+//   try {
+//     // Update Authentication
+//     const authUpdates = {};
+//     if (updates.email) authUpdates.email = updates.email;
+//     if (updates.password) authUpdates.password = updates.password;
+
+//     if (Object.keys(authUpdates).length > 0) {
+//       const response = await axios.post('https://puri-dashboard-server.onrender.com/api/update-auth', {
+//         uid,
+//         ...authUpdates
+//       }, {
+//         headers: {
+//           'Content-Type': 'application/json',
+//         }
+//       });
+
+//       if (response.status === 200) {
+//         authUpdateSuccess = true;
+        
+//         console.log('Authentication updated successfully');
+//       } else {
+        
+//         throw new Error(response.data.error || 'Failed to update auth credentials');
+//       }
+//     } else {
+//       authUpdateSuccess = true; // No auth updates needed
+//     }
+
+//     // Update Firestore
+//     const userQuery = query(collection(db, COLLECTION_NAME), where("authUID", "==", uid));
+//     const userSnapshot = await getDocs(userQuery);
+
+//     let userRef;
+//     if (userSnapshot.empty) {
+//       console.warn('User not found in Firestore, creating new document');
+//       userRef = doc(collection(db, COLLECTION_NAME));
+//     } else {
+//       userRef = doc(db, COLLECTION_NAME, userSnapshot.docs[0].id);
+//     }
+    
+//     const dbUpdates = { ...updates, authUID: uid };
+//     delete dbUpdates.password; // Don't store password in Firestore
+    
+//     if (dbUpdates.roles) {
+//       dbUpdates.roles = {
+//         admin: dbUpdates.roles.includes('admin'),
+//         booking: dbUpdates.roles.includes('booking'),
+//         documents: dbUpdates.roles.includes('documents'),
+//         constructionUpdate: dbUpdates.roles.includes('constructionUpdate')
+//       };
+//     }
+
+//     await setDoc(userRef, dbUpdates, { merge: true });
+//     firestoreUpdateSuccess = true;
+//     console.log('Firestore updated successfully');
+
+//     return { 
+//       message: 'Staff user updated successfully',
+//       authUpdateSuccess,
+//       firestoreUpdateSuccess
+//     };
+//   } catch (error) {
+//     console.error('Error updating staff user:', error);
+//     return {
+//       error: error.message,
+//       authUpdateSuccess,
+//       firestoreUpdateSuccess
+//     };
+//   }
+// };
 
 // export const removeStaffUser = async (userId) => {
 //   await deleteDoc(doc(db, COLLECTION_NAME, userId));

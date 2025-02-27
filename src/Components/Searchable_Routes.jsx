@@ -79,6 +79,13 @@ export const SEARCHABLE_ROUTES = [
           path: '/Amenityform',
           breadcrumb: ['Facility', 'Add Amenity']
         },
+        { 
+            name: 'Export Facility', 
+            icon: Buildings,
+
+            path: '/Facility',
+            breadcrumb: ['Facility', 'Export']
+          }
         // { 
         //   name: 'Edit Amenity', 
         //   path: '/Amenityform',
@@ -164,12 +171,28 @@ export const SEARCHABLE_ROUTES = [
           breadcrumb: ['Visitors', 'Guests']
         },
         { 
+            name: 'Export Guests ', 
+            icon: CalendarDots ,
+
+            path: '/Guest',
+            breadcrumb: ['Visitors', 'Guests','Export']
+          }
+        ,
+        { 
           name: 'Helpers', 
           icon: UserList  ,
 
           path: '/Helper',
           breadcrumb: ['Visitors', 'Helpers']
         },
+        { 
+            name: 'Export Helpers ', 
+            icon: CalendarDots ,
+
+            path: '/Helper',
+            breadcrumb: ['Visitors', 'Helpers','Export']
+          }
+        ,
         { 
           name: 'Delivery', 
           icon: UserList  ,
@@ -178,6 +201,14 @@ export const SEARCHABLE_ROUTES = [
           breadcrumb: ['Visitors', 'Delivery']
         },
         { 
+            name: 'Export Delivery ', 
+            icon: CalendarDots ,
+
+            path: '/Delivery',
+            breadcrumb: ['Visitors', 'Delivery','Export']
+          }
+        ,
+        { 
           name: 'Cab', 
           icon: UserList  ,
 
@@ -185,12 +216,29 @@ export const SEARCHABLE_ROUTES = [
           breadcrumb: ['Visitors', 'Cab']
         },
         { 
+            name: 'Export Cab ', 
+            icon: CalendarDots ,
+
+            path: '/Cab',
+            breadcrumb: ['Visitors', 'Cab','Export']
+          }
+        ,
+        { 
           name: 'Other Visitors', 
           icon: UserList  ,
 
           path: '/Other',
           breadcrumb: ['Visitors', 'Other']
-        }
+        },
+        { 
+            name: 'Export Others ', 
+            icon: CalendarDots ,
+
+            path: '/Other',
+            breadcrumb: ['Visitors', 'Other','Export']
+          }
+        ,
+
       ]
     },
   
@@ -203,7 +251,14 @@ export const SEARCHABLE_ROUTES = [
           icon: Package  ,
           path: '/Parcels',
           breadcrumb: ['Parcels']
-        }
+        },
+        { 
+            name: 'Export Parcels ', 
+            icon: CalendarDots ,
+
+            path: '/Parcels',
+            breadcrumb: [ 'Parcels','Export']
+          }
       ]
     },
   
@@ -228,7 +283,7 @@ export const SEARCHABLE_ROUTES = [
             name: 'Export Notice', 
             icon: Megaphone  , 
 
-            path: '/Noticeform',
+            path: '/Notices',
             breadcrumb: ['Notices', 'Export']
           }
       ]
@@ -264,18 +319,12 @@ export const SEARCHABLE_ROUTES = [
           path: '/feedback',
           breadcrumb: ['Feedback']
         },
-        { 
-          name: 'Add Feedback', 
-          icon: ChatText  ,
-
-          path: '/feedbackForm',
-          breadcrumb: ['Feedback', 'Add Feedback']
-        },
+       
         { 
           name: 'Export Feedback',
           icon: ChatText  ,
  
-          path: '/feedbackForm',
+          path: '/feedback',
           breadcrumb: ['Feedback', 'Export']
         },
         // { 
@@ -315,7 +364,20 @@ export const SEARCHABLE_ROUTES = [
           icon: Files  ,
           path: '/document',
           breadcrumb: ['Documents']
-        }
+        },
+        { 
+            name: 'Add Documents', 
+            icon: Files  ,
+            path: '/document',
+            breadcrumb: ['Documents', 'Add']
+          },
+        { 
+            name: ' Export Documents ',
+            icon: Files  ,
+   
+            path: '/document',
+            breadcrumb: ['Documents', 'Export']
+          }
       ]
     },
   
@@ -336,7 +398,14 @@ export const SEARCHABLE_ROUTES = [
 
           path: '/constructionupdate',
           breadcrumb: ['Construction Update', 'Add']
-        }
+        },
+        { 
+            name: 'Export Construction ', 
+            icon:ArrowsClockwise,
+  
+            path: '/construction',
+            breadcrumb: ['Construction Update', 'Export']
+          }
       ]
     },
   
@@ -351,23 +420,13 @@ export const SEARCHABLE_ROUTES = [
           breadcrumb: ['Users', 'Staff']
         },
         { 
-          name: 'Referrals', 
-          icon: UserCircle  ,
-
-          path: '/referrals',
-          breadcrumb: ['Users', 'Referrals']
-        },
-        // { 
-        //   name: 'Referral Details', 
-
-        //   path: '/referalNext',
-        //   breadcrumb: ['Users', 'Referrals', 'Details']
-        // },
-        // { 
-        //   name: 'Referral Details (with ID)', 
-        //   path: '/referalNext/:id',
-        //   breadcrumb: ['Users', 'Referrals', 'Details']
-        // },
+            name: 'Export Staff Users', 
+            icon: UserCircle  ,
+            path: '/user',
+            breadcrumb: ['Users', 'Staff','Export']
+          },
+        
+        
         { 
           name: 'Residents', 
           icon: UserCircle  ,
@@ -376,12 +435,25 @@ export const SEARCHABLE_ROUTES = [
           breadcrumb: ['Users', 'Residents']
         },
         { 
+            name: 'Export Residents', 
+            icon: UserCircle  ,
+            path: '/Resident',
+            breadcrumb: ['Users', 'Resident','Export']
+          },
+        { 
           name: 'Guest Login', 
           icon: UserCircle  ,
 
           path: '/GuestLogin',
           breadcrumb: ['Users', 'Guest Login']
-        }
+        },
+        { 
+            name: 'Export Guest Login', 
+            icon: UserCircle  ,
+  
+            path: '/GuestLogin',
+            breadcrumb: ['Users', 'Guest Login','Export']
+          }
       ]
     },
   
@@ -389,15 +461,22 @@ export const SEARCHABLE_ROUTES = [
     {
       category: 'Helper Management',
       items: [
+        // { 
+        //   name: 'Add Helper', 
+        //   icon: UserCircle  ,
+
+        //   path: '/AddHelper',
+        //   breadcrumb: ['Users', 'Helpers', 'Add Helper']
+        // },
+        { 
+            name: 'Export Helpers', 
+            icon: UserCircle  ,
+  
+            path: '/AddHelper',
+            breadcrumb: ['Users', 'Helpers', 'Export']
+          },
         { 
           name: 'Add Helper', 
-          icon: UserCircle  ,
-
-          path: '/AddHelper',
-          breadcrumb: ['Users', 'Helpers', 'Add Helper']
-        },
-        { 
-          name: 'New Helper', 
           icon: UserCircle  ,
 
           path: '/AddNewHelper',
@@ -410,20 +489,27 @@ export const SEARCHABLE_ROUTES = [
     {
       category: 'Guard Management',
       items: [
-        { 
-          name: 'Add Guard', 
-          icon: UserCircle  ,
+        // { 
+        //   name: 'Add Guard', 
+        //   icon: UserCircle  ,
 
-          path: '/AddGuard',
-          breadcrumb: ['Users', 'Guards', 'Add Guard']
-        },
+        //   path: '/AddGuard',
+        //   breadcrumb: ['Users', 'Guards', 'Add Guard']
+        // },
         { 
-          name: 'New Guard', 
+          name: 'Add Guards', 
           icon: UserCircle  ,
 
           path: '/AddNewGuard',
-          breadcrumb: ['Users', 'Guards', 'New Guard']
+          breadcrumb: ['Users', 'Guards', 'Add Guard']
         },
+        { 
+            name: 'Export Guard', 
+            icon: UserCircle  ,
+  
+            path: '/AddGuard',
+            breadcrumb: ['Users', 'Guards', 'Export']
+          },
         // { 
         //   name: 'Edit Guard', 
         //   path: '/AddNewGuard/:id',
@@ -442,12 +528,37 @@ export const SEARCHABLE_ROUTES = [
           path: '/support',
           breadcrumb: ['Support']
         },
+        { 
+            name: 'Export Support', 
+            icon: Gift   ,
+            path: '/support',
+            breadcrumb: ['Support',"Export"]
+          },
         // { 
         //   name: 'Support View', 
         //   path: '/support_view/:id',
         //   breadcrumb: ['Support', 'View']
         // }
       ]
+    },
+    //Referrals
+    {
+        category:"Referrals",
+        items:[
+            { 
+                name: 'Referrals', 
+                icon: UserCircle  ,
+      
+                path: '/referrals',
+                breadcrumb: ['Referrals']
+              },
+              { 
+                  name: 'Export Referrals', 
+                  icon: UserCircle  ,
+                  path: '/referrals',
+                  breadcrumb: ['Referrals','Export']
+                },
+        ]
     },
   
     // Rental Requests

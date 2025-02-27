@@ -96,12 +96,14 @@
 // };
 
 // export default CurrentVisitors;
+
+
 import React, { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, getFirestore, orderBy } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
 
 const DashboardCard = ({ children }) => (
-  <div className="space-y-6 bg-white rounded-lg p-6">
+  <div className="space-y-6 bg-white rounded-lg p-6 border  border-gray-200">
     {children}
   </div>
 );
@@ -165,7 +167,7 @@ export const CurrentVisitors = () => {
     <DashboardCard>
       <h2 className="text-[16px] text-gray-900 font-medium">Current Visitors</h2>
       
-      <div className="flex items-end gap-8">
+      <div className="flex items-end gap-7">
         <div>
           <div className="text-[36px] font-medium text-gray-900 leading-none">
             {visitorStats.total}

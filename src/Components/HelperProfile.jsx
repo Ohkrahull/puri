@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronLeft, X, Upload } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, query, where, deleteDoc } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
 import { DownloadSimple } from 'phosphor-react';
+import { useHeader } from '../context/HeaderContext';
 
 const WING_DATA = [
   { label: 'A', value: 'A' },
@@ -40,6 +41,8 @@ const HelperProfile = () => {
   const navigate = useNavigate();
   const db = getFirestore(getApp());
   const storage = getStorage(getApp());
+  const { setFormDirty, startSave, endSave, setIsFormEditing, headerData } = useHeader();
+const { setSelectedUser, setIsAddingNew } = headerData;
 
   const [selectedWings, setSelectedWings] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,6 +50,7 @@ const HelperProfile = () => {
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
   const [selectedWing, setSelectedWing] = useState('A');
   const [selectedFlat, setSelectedFlat] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -63,48 +67,7 @@ const HelperProfile = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       setIsLoading(true);
-  //       const helperDoc = await getDoc(doc(db, 'helpers', id));
-  //       if (helperDoc.exists()) {
-  //         const helperData = helperDoc.data();
-  //         setFormData({
-  //           firstName: helperData.firstName || '',
-  //           lastName: helperData.lastName || '',
-  //           phone: helperData.phoneNumber || '',
-  //           documentType: helperData.documentType || '',
-  //           service: helperData.services?.[0]?.name || '',
-  //           imageUrl: helperData.imageUrl || '',
-  //           documents: helperData.documents || [],
-  //           employeeId: helperData.employeeId || ''
-  //         });
-  //         setSelectedWings(helperData.flatNumbers || []);
-
-  //         if (helperData.employeeId) {
-  //           const guardQuery = query(
-  //             collection(db, 'guardUser'), 
-  //             where('employeeId', '==', helperData.employeeId)
-  //           );
-  //           const guardSnapshot = await getDocs(guardQuery);
-  //           if (!guardSnapshot.empty) {
-  //             setGuardData(guardSnapshot.docs[0].data());
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //       toast.error('Error loading profile data');
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   if (id) {
-  //     fetchData();
-  //   }
-  // }, [id, db]);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -116,7 +79,7 @@ const HelperProfile = () => {
           setFormData({
             firstName: helperData.firstName || '',
             lastName: helperData.lastName || '',
-            phone: helperData.phoneNumber || '',
+            phone: helperData.visitorPhoneNumber || '',
             documentType: helperData.documentType || '',
             service: helperData.services?.[0]?.name || '',
             imageUrl: helperData.imageUrl || '',
@@ -168,6 +131,29 @@ const HelperProfile = () => {
       fetchData();
     }
   }, [id, db]);
+
+  const handleDeleteProfile = async () => {
+    try {
+      await deleteDoc(doc(db, 'helpers', id));
+      toast.success('Profile deleted successfully');
+      navigate('/AddHelper');
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      toast.error('Error deleting profile');
+    }
+  };
+  // useEffect(() => {
+  //   setIsFormEditing(true);
+  //   setSelectedUser(true); // Indicate we have a selected user
+  //   setIsAddingNew(false); // Indicate we're not adding new
+    
+  //   return () => {
+  //     setIsFormEditing(false);
+  //     setFormDirty(false);
+  //     setSelectedUser(false);
+  //     setIsAddingNew(false);
+  //   };
+  // }, [setIsFormEditing, setFormDirty, setSelectedUser, setIsAddingNew]);
 
   const getDocumentByType = (documentType) => {
     return formData.documents.find(doc => doc.documentName === documentType);
@@ -243,42 +229,96 @@ const HelperProfile = () => {
     setFormData(prev => ({ ...prev, documentType: type }));
     setShowDocumentDropdown(false);
     setIsDirty(true);
+    setFormDirty(true); // Add this line
   };
+
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     [name]: value
+  //   }));
+  //   setIsDirty(true);
+  // };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log('Input change:', name, value); // Add logging
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
     setIsDirty(true);
+    setFormDirty(true);
   };
-
+  // const handleRemoveWing = (wingToRemove) => {
+  //   setSelectedWings(prev => prev.filter(wing => wing !== wingToRemove));
+  //   setIsDirty(true);
+  // };
   const handleRemoveWing = (wingToRemove) => {
     setSelectedWings(prev => prev.filter(wing => wing !== wingToRemove));
     setIsDirty(true);
+    setFormDirty(true); // Add this
   };
+
+  // const handleUpdateProfile = async () => {
+  //   try {
+  //     const updateData = {
+  //       firstName: formData.firstName,
+  //       lastName: formData.lastName,
+  //       visitorPhoneNumber: formData.phone, // Changed from phoneNumber to visitorPhoneNumber
+  //       documentType: formData.documentType,
+  //       services: [{ name: formData.service, status: 'active' }],
+  //       flatNumbers: selectedWings,
+  //       updatedAt: new Date()
+  //     };
+
+  //     await updateDoc(doc(db, 'helpers', id), updateData);
+  //     toast.success('Profile updated successfully');
+  //     setIsDirty(false);
+  //     setFormDirty(false); // Add this
+  //   } catch (error) {
+  //     console.error('Error updating profile:', error);
+  //     toast.error('Error updating profile');
+  //   }
+  // };
 
   const handleUpdateProfile = async () => {
     try {
-      const updateData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phoneNumber: formData.phone,
-        documentType: formData.documentType,
-        services: [{ name: formData.service, status: 'active' }],
-        flatNumbers: selectedWings,
-        updatedAt: new Date()
-      };
-
-      await updateDoc(doc(db, 'helpers', id), updateData);
-      toast.success('Profile updated successfully');
-      setIsDirty(false);
+      const form = document.getElementById('owner-form');
+      if (form) {
+        const saveEvent = new CustomEvent('saveForm', {
+          bubbles: true,
+          detail: {
+            successCallback: () => {
+              setIsDirty(false);
+              setFormDirty(false);
+              navigate('/AddHelper');
+            },
+            errorCallback: () => {
+              toast.error('Failed to save changes');
+            }
+          }
+        });
+        form.dispatchEvent(saveEvent);
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error updating profile');
     }
   };
+  // const handleAddFlat = () => {
+  //   if (selectedWing && selectedFlat) {
+  //     const flatString = `${selectedWing}-${selectedFlat}`;
+  //     if (!selectedWings.includes(flatString)) {
+  //       setSelectedWings(prev => [...prev, flatString]);
+  //       setIsDirty(true);
+  //     }
+  //     setIsModalOpen(false);
+  //     setSelectedWing('A');
+  //     setSelectedFlat('');
+  //   }
+  // };
 
   const handleAddFlat = () => {
     if (selectedWing && selectedFlat) {
@@ -286,6 +326,7 @@ const HelperProfile = () => {
       if (!selectedWings.includes(flatString)) {
         setSelectedWings(prev => [...prev, flatString]);
         setIsDirty(true);
+        setFormDirty(true); // Add this
       }
       setIsModalOpen(false);
       setSelectedWing('A');
@@ -293,10 +334,52 @@ const HelperProfile = () => {
     }
   };
 
+  // Add form save event listener
+  useEffect(() => {
+    const form = document.getElementById('owner-form');
+    
+    const handleSaveForm = async (event) => {
+      const { successCallback, errorCallback } = event.detail;
+      
+      try {
+        startSave();
+        
+        // Create update data from current form state
+        const updateData = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          visitorPhoneNumber: formData.phone, // Make sure we're using the current phone value
+          documentType: formData.documentType,
+          services: [{ name: formData.service, status: 'active' }],
+          flatNumbers: selectedWings,
+          updatedAt: new Date()
+        };
+  
+        await updateDoc(doc(db, 'helpers', id), updateData);
+        
+        successCallback();
+        setIsDirty(false);
+        setFormDirty(false);
+        navigate('/AddHelper');
+        
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        errorCallback();
+        toast.error('Failed to save changes');
+      }
+    };
+  
+    if (form) {
+      form.addEventListener('saveForm', handleSaveForm);
+      return () => form.removeEventListener('saveForm', handleSaveForm);
+    }
+  }, [db, formData, id, navigate, selectedWings, setFormDirty, startSave]); // Add all dependencies
+
   const handleServiceSelect = (service) => {
     setFormData(prev => ({ ...prev, service }));
     setShowServiceDropdown(false);
     setIsDirty(true);
+    setFormDirty(true); // Add this line
   };
 
   const getFileIcon = (fileName) => {
@@ -397,6 +480,7 @@ const HelperProfile = () => {
 
   return (
     <div className="p-8 ml-6">
+      <form id="owner-form">
       {/* Back Button */}
       <div className="mb-8 w-[80px]" style={{
         // border:'1px solid red'
@@ -471,7 +555,12 @@ const HelperProfile = () => {
                 <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
                 <div className="flex gap-2">
                   <button 
-                    onClick={() => setIsModalOpen(true)}
+                  type="button" // Add this
+                  onClick={(e) => {
+                    e.preventDefault(); // Add this
+                    setIsModalOpen(true)
+                  }}
+                    // onClick={() => setIsModalOpen(true)}
                     style={{fontSize:16}}
                     className="px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center gap-2 text-[#4B5563] min-w-[100px]"
                   >
@@ -502,7 +591,12 @@ const HelperProfile = () => {
                     </div>
                   ))}
                   <button 
-                    onClick={() => setIsModalOpen(true)}
+                  type="button" // Add this
+                  onClick={(e) => {
+                    e.preventDefault(); // Add this
+                    setIsModalOpen(true)
+                  }}
+                    // onClick={() => setIsModalOpen(true)}
                     className="text-blue-500 text-end text-sm hover:text-blue-600"
                   >
                     Add More
@@ -516,7 +610,11 @@ const HelperProfile = () => {
               <div className="space-y-1.5 dropdown-container relative">
                 <label className="text-[12px] text-[#6B7280] block">Document Type</label>
                 <button 
-                  onClick={() => setShowDocumentDropdown(!showDocumentDropdown)}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowDocumentDropdown(!showDocumentDropdown);
+                }}
                   style={{fontSize:16}}
                   className="w-full px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center justify-between text-[#4B5563]"
                 >
@@ -528,8 +626,13 @@ const HelperProfile = () => {
                     {DOCUMENT_TYPES.map((type) => (
                       <button
                         key={type.name}
+                        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          handleDocumentTypeSelect(type.name);
+        }}
                        
-                        onClick={() => handleDocumentTypeSelect(type.name)}
+                        // onClick={() => handleDocumentTypeSelect(type.name)}
                         className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#4B5563]"
                       >
                         {type.name}
@@ -541,7 +644,11 @@ const HelperProfile = () => {
               <div className="space-y-1.5 dropdown-container relative">
                 <label className="text-[12px] text-[#6B7280] block">Service</label>
                 <button 
-                  onClick={() => setShowServiceDropdown(!showServiceDropdown)}
+                  type="button" // Add this
+                  onClick={(e) => {
+                    e.preventDefault(); // Add this
+                    setShowServiceDropdown(!showServiceDropdown)
+                  }}
                   style={{fontSize:16}}
                   className="w-full px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center justify-between text-[#4B5563]"
                 >
@@ -553,7 +660,11 @@ const HelperProfile = () => {
                     {SERVICES.map((service) => (
                       <button
                         key={service}
-                        onClick={() => handleServiceSelect(service)}
+                        type="button" // Add this
+                        onClick={(e) => {
+                          e.preventDefault(); // Add this
+                          handleServiceSelect(service)
+                        }}
                         className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#4B5563]"
                       >
                         {service}
@@ -615,7 +726,7 @@ const HelperProfile = () => {
             )}
           </div>
 
-          <button 
+          {/* <button 
             onClick={handleUpdateProfile}
             style={{fontSize:16, borderRadius:8}}
             className={`w-full py-4 rounded-2xl transition-colors  ${
@@ -625,7 +736,86 @@ const HelperProfile = () => {
             }`}
           >
             {isDirty ? 'Update Profile' : 'Delete Profile'}
-          </button>
+          </button> */}
+          {/* <button 
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    const form = document.getElementById('owner-form');
+    if (form) {
+      const saveEvent = new CustomEvent('saveForm', {
+        bubbles: true,
+        detail: {
+          successCallback: () => {
+            setIsDirty(false);
+            setFormDirty(false);
+            navigate('/AddHelper');
+          },
+          errorCallback: () => {
+            toast.error('Failed to save changes');
+          }
+        }
+      });
+      form.dispatchEvent(saveEvent);
+    }
+  }}
+  style={{fontSize:16, borderRadius:8}}
+  className={`w-full py-4 rounded-2xl transition-colors  ${
+    isDirty 
+      ? 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-300' 
+      : 'text-[#E23744] border border-red-300 hover:bg-red-100' 
+  }`}
+>
+  {isDirty ? 'Update Profile' : 'Delete Profile'}
+</button> */}
+{/* <button 
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    if (isDirty) {
+      // If dirty, use the normal update flow
+      const form = document.getElementById('owner-form');
+      if (form) {
+        const saveEvent = new CustomEvent('saveForm', {
+          bubbles: true,
+          detail: {
+            successCallback: () => {
+              setIsDirty(false);
+              setFormDirty(false);
+              navigate('/AddHelper');
+            },
+            errorCallback: () => {
+              toast.error('Failed to save changes');
+            }
+          }
+        });
+        form.dispatchEvent(saveEvent);
+      }
+    } else {
+      // If not dirty, show delete confirmation
+      setShowDeleteModal(true);
+    }
+  }}
+  style={{fontSize:16, borderRadius:8}}
+  className={`w-full py-4 rounded-2xl transition-colors  ${
+    isDirty 
+      ? 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-300' 
+      : 'text-[#E23744] border border-red-300 hover:bg-red-100' 
+  }`}
+>
+  {isDirty ? 'Update Profile' : 'Delete Profile'}
+</button> */}
+<button 
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    setShowDeleteModal(true);
+  }}
+  style={{fontSize:16, borderRadius:8}}
+  className="w-full py-4 rounded-2xl transition-colors text-[#E23744] border border-red-300 hover:bg-red-100"
+>
+  Delete Profile
+</button>
         </div>
       </div>
 
@@ -709,7 +899,41 @@ const HelperProfile = () => {
           </div>
         </div>
       )}
+      </form>
+
+      {/* Delete Confirmation Modal */}
+{showDeleteModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg w-[100%] max-w-lg p-6">
+      <div className="text-center">
+        <h3 className="text-[16px] font-medium text-gray-900 mb-4">Delete Profile</h3>
+        <p className="text-[14px] text-gray-500 mb-6">
+          Are you sure you want to delete this helper profile? This action cannot be undone.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => setShowDeleteModal(false)}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteProfile}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
+)}
+      
+    </div>
+    
+
   );
 };
 

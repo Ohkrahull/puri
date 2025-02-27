@@ -38,9 +38,9 @@ export const createAmenity = async (amenityData, imageFiles) => {
         isDisabled: amenityData.isDisabled,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        status: 'ACTIVE',
+        
         imageUrls: [],
-        bookingEnabled: !amenityData.isDisabled
+        
       });
   
       // Upload images and get URLs

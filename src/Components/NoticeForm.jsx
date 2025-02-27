@@ -308,7 +308,7 @@ const NoticeForm = () => {
     })) : []
   );
 
-  const categories = ['Security', 'Maintenance', 'Services', 'Event'];
+  const categories = ['Security', 'Maintenance', 'Services', 'Event','Emergency','Other'];
 
   const inputStyle = {
     width: "100%",
@@ -333,8 +333,38 @@ const NoticeForm = () => {
     fontFamily: "Plus_Jakarta",
   };
 
+  // const handleImageUpload = useCallback((event) => {
+  //   const file = event.target.files[0];
+  //   if (file && file.size <= 5 * 1024 * 1024) {
+  //     const newImage = {
+  //       id: Date.now().toString(),
+  //       file,
+  //       preview: URL.createObjectURL(file),
+  //       fileName: file.name,
+  //       uploadedAt: new Date().toISOString(),
+  //       isNew: true
+  //     };
+  //     setImages(prev => [...prev, newImage]);
+  //   } else {
+  //     toast.error('File size should be less than 5MB');
+  //   }
+  // }, []);
   const handleImageUpload = useCallback((event) => {
     const file = event.target.files[0];
+    
+    // Check if maximum image limit is reached
+    if (images.length >= 5) {
+      toast.error('Maximum 5 images allowed');
+      return;
+    }
+  
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file?.type)) {
+      toast.error('Only JPG, JPEG and PNG files are allowed');
+      return;
+    }
+  
     if (file && file.size <= 5 * 1024 * 1024) {
       const newImage = {
         id: Date.now().toString(),
@@ -348,7 +378,7 @@ const NoticeForm = () => {
     } else {
       toast.error('File size should be less than 5MB');
     }
-  }, []);
+  }, [images]);
 
   const handleImageDelete = useCallback((index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
@@ -487,7 +517,7 @@ const NoticeForm = () => {
               />
             </div>
 
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <label style={labelStyle}>Media</label>
               <div className="flex flex-wrap gap-4">
                 {images.map((image, index) => (
@@ -519,7 +549,56 @@ const NoticeForm = () => {
                   />
                 </label>
               </div>
-            </div>
+            </div> */}
+            <div className="mb-6">
+  <label style={labelStyle}>Media</label>
+  <div className="flex flex-wrap gap-4">
+    {images.map((image, index) => (
+      <div key={image.id} className="relative w-24 h-24">
+        <img
+          src={image.preview}
+          alt="Upload preview"
+          className="w-full h-full object-cover rounded-lg"
+        />
+        <button
+          onClick={() => handleImageDelete(index)}
+          className="absolute top-1 right-1 bg-white rounded-full p-1"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6L18 18" stroke="#EF4444" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      </div>
+    ))}
+    {images.length < 5 && (
+      <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5V19M5 12H19" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+        {/* <div className="mt-2 text-center">
+          <p className="text-xs text-gray-500">
+            {`${5 - images.length} remaining`}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            JPG, PNG
+          </p>
+          <p className="text-xs text-gray-500">
+            Max 5MB
+          </p>
+        </div> */}
+        <input
+          type="file"
+          accept="image/jpeg,image/jpg,image/png"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
+      </label>
+    )}
+  </div>
+  <p className="text-sm  text-gray-500 mt-6">
+    Upload up to 5 images (JPG, PNG - max 5MB each)
+  </p>
+</div>
           </div>
         </div>
 

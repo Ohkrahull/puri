@@ -3,12 +3,14 @@ import { getApp } from 'firebase/app';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { ConfirmationDialog } from './confirmationDialog';
+import RejectionModal from './RejectedModal';
 
 
 // Status Badge Component
 const StatusBadge = ({ status, helper }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showRejectionModal, setShowRejectionModal] = useState(false);
     const [pendingStatus, setPendingStatus] = useState(null);
     const db = getFirestore(getApp());
   
@@ -108,10 +110,20 @@ const StatusBadge = ({ status, helper }) => {
       }
     };
   
+    // const initiateStatusChange = (newStatus) => {
+    //   setIsOpen(false);
+    //   setPendingStatus(newStatus);
+    //   setShowConfirmation(true);
+    // };
     const initiateStatusChange = (newStatus) => {
       setIsOpen(false);
       setPendingStatus(newStatus);
-      setShowConfirmation(true);
+      
+      if (newStatus === 'rejected') {
+        setShowRejectionModal(true);
+      } else {
+        setShowConfirmation(true);
+      }
     };
   
     const handleStatusChange = async (newStatus) => {
@@ -198,6 +210,18 @@ const StatusBadge = ({ status, helper }) => {
             {...getConfirmationMessage(pendingStatus)}
           />
         )}
+
+{showRejectionModal && (
+        <RejectionModal
+          isOpen={showRejectionModal}
+          onClose={() => setShowRejectionModal(false)}
+          helper={helper}
+          onConfirm={() => {
+            toast.success('Helper rejected successfully');
+            setShowRejectionModal(false);
+          }}
+        />
+      )}
       </>
     );
   };

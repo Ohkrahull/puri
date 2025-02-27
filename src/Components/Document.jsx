@@ -162,6 +162,7 @@ import DocumentTable from "../Tables/DocumentsTable";
 import AddDocumentsModal from "./Modal_for_Document";
 import { fetchUserDocuments } from '../firebase/services/documents';
 import ExportModal from "./DocumentExport";
+import { AddIcon, ExportIcon, HighlightButton } from "./HighLightButton";
 
 const Document = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -201,7 +202,7 @@ const Document = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <button
+          {/* <button
             onClick={() => setShowExportModal(true)}
             style={{
               display: "flex",
@@ -221,8 +222,23 @@ const Document = () => {
               </svg>
             </span>
             Export 
-          </button>
-          <button 
+          </button> */}
+          <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
+
+<HighlightButton 
+  type="primary"
+  onClick={openModal}
+>
+  <AddIcon />
+  {currentTab === "Agreement" ? "Add Document" : " Add Demand Letter"}
+</HighlightButton>
+          {/* <button 
             style={{fontSize:'18px', fontFamily: "Plus_Jakarta"}}
             onClick={openModal}
             className="flex items-center px-6 py-3 bg-gray-900 rounded-lg text-white"
@@ -231,7 +247,7 @@ const Document = () => {
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
             Add {currentTab === "Agreement" ? "Document" : "Demand Letter"}
-          </button>
+          </button> */}
         </div>
       </div>
 

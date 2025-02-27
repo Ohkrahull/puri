@@ -8,10 +8,11 @@ import AddMemberModal from './AddmemberModal';
 import AddStaffModal from "./AddStaffModal";
 import { toast } from "react-toastify";
 import StaffTable from "../Tables/StaffTable";
-import ExportModal from './exportUser';
+import ExportModal from './Exports/Staff';
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 
 const Users = () => {
-    const [activeTab, setActiveTab] = useState("Members");
+    const [activeTab, setActiveTab] = useState("Staff");
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
     const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
     const [refreshStaffTable, setRefreshStaffTable] = useState(false);
@@ -99,18 +100,18 @@ const Users = () => {
 
     return (
         <>
-            <div className="p-8 lg:p-12">
+            <div className="p-3 lg:p-3 ml-[40px]">
                 <div className="flex justify-between">
                     <div>
                         <h1 className={`${styles.customScrollbar} flex-1 text-gray-900`} style={{ fontWeight: "bold", fontSize: "24px", lineHeight: "32px", gap: "2px", fontFamily:'Plus_Jakarta' }}>
-                            Users
+                            Staff
                         </h1>
                         <p className="gap-2" style={{ fontSize: "17px", color: "var(--Gray-400, #6B7280)", fontStyle: "normal", fontWeight: "500", lineHeight: "28px", fontFamily:'Plus_Jakarta' }}>
-                            Manage all your users from one place.
+                            Manage all your staff from one place.
                         </p>
                     </div>
                     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", justifyItems: "flex-end" }}>
-                        <button
+                        {/* <button
                             onClick={() => setShowExportModal(true)}
                             style={{
                                 display: "flex",
@@ -130,13 +131,20 @@ const Users = () => {
                                 </svg>
                             </span>
                             Export
-                        </button>
+                        </button> */}
+                         <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
                         {renderAddButton()}
                     </div>
                 </div>
 
-                <div className="flex mt-8 relative justify-start text-left" style={{ gap: '24px', borderBottom: '1px solid var(--Gray-200, #D1D5DB)', fontFamily:'Plus_Jakarta' }}>
-                    {["Members", "Staff", "Guests"].map((tab) => (
+                {/* <div className="flex mt-8 relative justify-start text-left" style={{ gap: '24px', borderBottom: '1px solid var(--Gray-200, #D1D5DB)', fontFamily:'Plus_Jakarta' }}>
+                    {["Staff"].map((tab) => (
                         <div
                             key={tab}
                             className={`pb-2 cursor-pointer ${activeTab === tab ? "text-gray-900 font-semibold border-b-2 border-gray-900" : "text-gray-400"}`}
@@ -146,7 +154,7 @@ const Users = () => {
                             {tab}
                         </div>
                     ))}
-                </div>
+                </div> */}
                 <div className="mt-6 rounded-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         {renderTable()}

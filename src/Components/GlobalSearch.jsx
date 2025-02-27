@@ -795,8 +795,32 @@ const GlobalSearchDropdown = () => {
     performSearch(value);
   };
 
-  const handleSearchSelect = (path) => {
-    navigate(path);
+//   const handleSearchSelect = (path) => {
+//     navigate(path);
+//     setIsDropdownOpen(false);
+//     setSearchTerm('');
+//   };
+const handleSearchSelect = (result) => {
+    if (!result) return;
+  
+    let actionType = null;
+    const resultNameLower = (result.name || '').toLowerCase();
+    const breadcrumbs = result.breadcrumb || [];
+    
+    // Check if it's an add action
+    if (resultNameLower.includes('add') || 
+        breadcrumbs.some(bc => bc && bc.toLowerCase().includes('add'))) {
+      actionType = 'add';
+    }
+    // Check if it's an export action 
+    else if (resultNameLower.includes('export') || 
+             breadcrumbs.some(bc => bc && bc.toLowerCase().includes('export'))) {
+      actionType = 'export';
+    }
+  
+    // Add highlight parameter to URL if there's an action type
+    const highlightParam = actionType ? `?highlight=${actionType}` : '';
+    navigate(`${result.path}${highlightParam}`);
     setIsDropdownOpen(false);
     setSearchTerm('');
   };
@@ -804,7 +828,7 @@ const GlobalSearchDropdown = () => {
   return (
     <div 
       ref={searchContainerRef} 
-      className="relative flex-1 max-w-4xl transition-all duration-300 ease-in-out"
+      className="relative flex-1 max-w-5xl transition-all duration-300 ease-in-out"
       style={{ fontFamily: "Plus_Jakarta" }}
     >
       <div className="relative w-full">
@@ -859,7 +883,7 @@ const GlobalSearchDropdown = () => {
                   <li 
                     key={index}
                     className="px-4 py-3 hover:bg-gray-100 cursor-pointer group"
-                    onClick={() => handleSearchSelect(result.path)}
+                    onClick={() => handleSearchSelect(result)}
                   >
                     {/* <div className="flex items-center justify-between">
                       <div>

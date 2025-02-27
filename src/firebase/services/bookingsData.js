@@ -159,11 +159,36 @@ export const fetchBookings = (userId, callback) => {
 // };
 
 // New function to fetch authorized user details
+// export const fetchAuthorizedUserDetails = async (phoneNumber) => {
+//   try {
+//     const userDoc = await getDoc(doc(db, AUTHORIZED_USERS_COLLECTION, phoneNumber));
+//     if (userDoc.exists()) {
+//       return userDoc.data();
+//     } else {
+//       console.log(`No authorized user found for phone number: ${phoneNumber}`);
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Error fetching authorized user details:', error);
+//     return null;
+//   }
+// };
 export const fetchAuthorizedUserDetails = async (phoneNumber) => {
   try {
     const userDoc = await getDoc(doc(db, AUTHORIZED_USERS_COLLECTION, phoneNumber));
     if (userDoc.exists()) {
-      return userDoc.data();
+      const userData = userDoc.data();
+      
+      // Check if this booking has specific flat information
+      if (userData.flats && userData.flats.approved && userData.flats.approved.length > 0) {
+        // Return the user data with their approved flats
+        return {
+          ...userData,
+          flats: userData.flats.approved
+        };
+      }
+      
+      return userData;
     } else {
       console.log(`No authorized user found for phone number: ${phoneNumber}`);
       return null;
@@ -174,6 +199,43 @@ export const fetchAuthorizedUserDetails = async (phoneNumber) => {
   }
 };
 
+// export const fetchUserDetails = async (phoneNumber) => {
+//   if (!phoneNumber) {
+//     throw new Error('Phone number is required');
+//   }
+
+//   try {
+//     // Check in guestUsers collection first
+//     const guestUserDoc = await getDoc(doc(db, GUEST_USERS_COLLECTION, phoneNumber));
+//     if (guestUserDoc.exists()) {
+//       const guestData = guestUserDoc.data();
+//       return {
+//         ...guestData,
+//         userType: 'Guest'
+//       };
+//     }
+
+//     // If not found in guestUsers, check in authorizedUsers collection
+//     const authorizedUserQuery = query(collection(db, AUTHORIZED_USERS_COLLECTION), where('phoneNumber', '==', phoneNumber));
+//     const authorizedUserSnapshot = await getDocs(authorizedUserQuery);
+    
+//     if (!authorizedUserSnapshot.empty) {
+//       const authorizedUserData = authorizedUserSnapshot.docs[0].data();
+//       return {
+//         ...authorizedUserData,
+//         userType: 'Member'
+//       };
+//     }
+
+//     // If not found in either collection
+//     console.log(`No user found for phone number: ${phoneNumber}`);
+//     return null;
+//   } catch (error) {
+//     console.error('Error fetching user details:', error);
+//     return null;
+//   }
+// };
+// Updated fetchAllBookings function
 export const fetchUserDetails = async (phoneNumber) => {
   if (!phoneNumber) {
     throw new Error('Phone number is required');
@@ -191,13 +253,19 @@ export const fetchUserDetails = async (phoneNumber) => {
     }
 
     // If not found in guestUsers, check in authorizedUsers collection
-    const authorizedUserQuery = query(collection(db, AUTHORIZED_USERS_COLLECTION), where('phoneNumber', '==', phoneNumber));
-    const authorizedUserSnapshot = await getDocs(authorizedUserQuery);
-    
-    if (!authorizedUserSnapshot.empty) {
-      const authorizedUserData = authorizedUserSnapshot.docs[0].data();
+    const userDoc = await getDoc(doc(db, AUTHORIZED_USERS_COLLECTION, phoneNumber));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      
+      // Check for flat information
+      let flatsInfo = [];
+      if (userData.flats && userData.flats.approved && userData.flats.approved.length > 0) {
+        flatsInfo = userData.flats.approved;
+      }
+      
       return {
-        ...authorizedUserData,
+        ...userData,
+        flats: flatsInfo,
         userType: 'Member'
       };
     }
@@ -210,42 +278,44 @@ export const fetchUserDetails = async (phoneNumber) => {
     return null;
   }
 };
-// Updated fetchAllBookings function
-export const fetchAllBookings = (callback) => {
-  return onSnapshot(collection(db, BOOKINGS_COLLECTION),
-    async (snapshot) => {
-      const bookingsPromises = snapshot.docs.map(async (doc) => {
-        const bookingData = {
-          id: doc.id,
-          ...doc.data()
-        };
+
+
+
+// export const fetchAllBookings = (callback) => {
+//   return onSnapshot(collection(db, BOOKINGS_COLLECTION),
+//     async (snapshot) => {
+//       const bookingsPromises = snapshot.docs.map(async (doc) => {
+//         const bookingData = {
+//           id: doc.id,
+//           ...doc.data()
+//         };
         
-        // Fetch user details for each booking
-        const userDetails = await fetchAuthorizedUserDetails(bookingData.phoneNumber);
+//         // Fetch user details for each booking
+//         const userDetails = await fetchAuthorizedUserDetails(bookingData.phoneNumber);
         
-        return {
-          ...bookingData,
-          userDetails
-        };
-      });
+//         return {
+//           ...bookingData,
+//           userDetails
+//         };
+//       });
 
-      const bookings = await Promise.all(bookingsPromises);
+//       const bookings = await Promise.all(bookingsPromises);
 
-      // Sort bookings by createdAt in descending order (most recent first)
-      bookings.sort((a, b) => {
-        if (a.createdAt && b.createdAt) {
-          return b.createdAt.toMillis() - a.createdAt.toMillis();
-        }
-        return 0; // In case createdAt is missing, maintain order
-      });
+//       // Sort bookings by createdAt in descending order (most recent first)
+//       bookings.sort((a, b) => {
+//         if (a.createdAt && b.createdAt) {
+//           return b.createdAt.toMillis() - a.createdAt.toMillis();
+//         }
+//         return 0; // In case createdAt is missing, maintain order
+//       });
 
-      callback(bookings);
-    },
-    (error) => {
-      console.error('Error fetching all bookings:', error);
-    }
-  );
-};
+//       callback(bookings);
+//     },
+//     (error) => {
+//       console.error('Error fetching all bookings:', error);
+//     }
+//   );
+// };
 
 
 // export const editBooking = async (bookingData) => {
@@ -283,7 +353,60 @@ export const fetchAllBookings = (callback) => {
 //     throw error;
 //   }
 // };
+export const fetchAllBookings = (callback) => {
+  return onSnapshot(collection(db, BOOKINGS_COLLECTION),
+    async (snapshot) => {
+      const bookingsPromises = snapshot.docs.map(async (doc) => {
+        const bookingData = {
+          id: doc.id,
+          ...doc.data()
+        };
+        
+        // Fetch user details for each booking
+        let userDetails = await fetchAuthorizedUserDetails(bookingData.phoneNumber);
+        
+        // If the booking already has specific flat info, prioritize that
+        if (bookingData.userFlatId && bookingData.userWing && bookingData.userFlatNumber) {
+          // The booking has flat-specific information
+          if (userDetails) {
+            // Only keep the specific flat information for this booking
+            userDetails = {
+              ...userDetails,
+              currentFlat: {
+                flatId: bookingData.userFlatId,
+                wing: bookingData.userWing,
+                flatNumber: bookingData.userFlatNumber
+              }
+            };
+          }
+        } else if (userDetails && userDetails.flats && userDetails.flats.length > 0) {
+          // If booking doesn't have flat info but user has flats, use the first flat
+          userDetails.currentFlat = userDetails.flats[0];
+        }
+        
+        return {
+          ...bookingData,
+          userDetails
+        };
+      });
 
+      const bookings = await Promise.all(bookingsPromises);
+
+      // Sort bookings by createdAt in descending order (most recent first)
+      bookings.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt.toMillis() - a.createdAt.toMillis();
+        }
+        return 0; // In case createdAt is missing, maintain order
+      });
+
+      callback(bookings);
+    },
+    (error) => {
+      console.error('Error fetching all bookings:', error);
+    }
+  );
+};
 export const editBooking = async (bookingData) => {
   try {
     const { id, ...updateData } = bookingData;

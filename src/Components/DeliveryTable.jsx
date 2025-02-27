@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import SortButton from '../Buttons/Sortdate';
 import DeleteModal from '../Modals/DeleteModal';
 import { Plus } from 'phosphor-react';
+import { useImageViewer } from '../context/ImageViewerContext';
 
 // SVG icon component that rotates based on sort direction
 const SortIcon = ({ direction = 'asc' }) => (
@@ -183,6 +184,7 @@ const DeliveryTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteItemName, setDeleteItemName] = useState('');
   const [deleteFunction, setDeleteFunction] = useState(null);
+  const { openImageViewer } = useImageViewer();
 
   const db = getFirestore(getApp());
   const sortDateRef = useRef(null);
@@ -393,7 +395,7 @@ const DeliveryTable = () => {
 //           </div>
 
 <div className="flex items-center space-x-3">
-  {visitor.imageUrl ? (
+  {/* {visitor.imageUrl ? (
     <img 
       src={visitor.imageUrl} 
       alt={`${visitor.firstName || ''} ${visitor.lastName || ''}`}
@@ -409,7 +411,33 @@ const DeliveryTable = () => {
         {`${visitor.firstName?.[0] || ''}${visitor.lastName?.[0] || ''}`}
       </span>
     </div>
-  )}
+  )} */}
+   {visitor.imageUrl ? (
+              <div className="relative group">
+                <img 
+                  src={visitor.imageUrl} 
+                  alt={`${visitor.firstName || ''} ${visitor.lastName || ''}`}
+                  className="w-10 h-10 rounded-full object-cover cursor-zoom-in transition-all duration-200 group-hover:ring-2 group-hover:ring-blue-500"
+                  onClick={() => openImageViewer(
+                    visitor.imageUrl,
+                    `${visitor.firstName || ''} ${visitor.lastName || ''}`
+                  )}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/Images/profile.png';
+                  }}
+                />
+                <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                  Click to view
+                </div>
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-600 uppercase">
+                  {`${visitor.firstName?.[0] || ''}${visitor.lastName?.[0] || ''}`}
+                </span>
+              </div>
+            )}
 
   <div className="flex flex-col">
     <span className="font-medium text-gray-900">

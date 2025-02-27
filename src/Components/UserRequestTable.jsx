@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import SortButton from '../Buttons/Sortdate';
 import DeleteModal from '../Modals/DeleteModal';
+import { useNavigate } from 'react-router-dom';
 
 const SearchInput = ({ requests, onSearch, userDetails }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -101,6 +102,7 @@ const FlatRequestsTable = () => {
   const db = getFirestore(getApp());
   const sortDateRef = useRef(null);
   const itemsPerPage = 10;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const requestsQuery = query(collection(db, 'flatRequests'), orderBy('createdAt', 'desc'));
@@ -225,10 +227,21 @@ const FlatRequestsTable = () => {
   
     const styles = getStatusStyles(currentStatus);
   
+    const handleStatusClick = (e) => {
+      e.stopPropagation(); // Stop event from bubbling up
+      setIsOpen(!isOpen);
+    };
+  
+    const handleStatusChange = (e, newStatus) => {
+      e.stopPropagation(); // Stop event from bubbling up
+      onStatusChange(newStatus);
+      setIsOpen(false);
+    };
+  
     return (
-      <div className="relative">
+      <div className="relative status-dropdown" onClick={(e) => e.stopPropagation()}>
         <div
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleStatusClick}
           className={`inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full ${styles.container}`}
           style={{ fontSize: '12px' }}
         >
@@ -250,10 +263,7 @@ const FlatRequestsTable = () => {
               return (
                 <div
                   key={status}
-                  onClick={() => {
-                    onStatusChange(status);
-                    setIsOpen(false);
-                  }}
+                  onClick={(e) => handleStatusChange(e, status)}
                   className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 flex items-center gap-2 ${
                     currentStatus?.toLowerCase() === status.toLowerCase() ? 'bg-gray-50' : ''
                   }`}
@@ -468,14 +478,23 @@ const FlatRequestsTable = () => {
               const actualIndex = indexOfFirstItem + index;
               const isSelected = selectedRows.includes(actualIndex);
               const user = userDetails[request.phoneNumber] || {};
+
+              const handleRowClick = () => {
+                navigate(`/UserRequests/${request.id}`);
+              };
               
               return (
-                <tr key={request.id} className="bg-white border-b hover:bg-gray-50" style={{fontSize:'14px'}}>
-                  <td className="p-4" style={{width:'40px'}}>
+                <tr key={request.id} className="bg-white border-b hover:bg-gray-50 cursor-pointer"  style={{fontSize:'14px'}} 
+                
+                onClick={handleRowClick}>
+                  <td className="p-4 checkbox-cell" style={{width:'40px'}} onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-center">
                       <CheckboxWithTick
                         isSelected={isSelected}
-                        onClick={() => handleRowSelect(actualIndex)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRowSelect(actualIndex);
+                        }}
                       />
                     </div>
                   </td>
@@ -495,7 +514,7 @@ const FlatRequestsTable = () => {
                   <td className="px-6 py-4">
                     {request.createdAt ? dayjs(request.createdAt.toDate()).format('D MMM, YYYY') : 'N/A'}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
         <StatusDropdown
           currentStatus={request.status}
           onStatusChange={(newStatus) => handleStatusChange(request.id, newStatus)}

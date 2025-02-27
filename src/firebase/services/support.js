@@ -2,30 +2,7 @@ import { db } from '../firebase';
 import { collection, getDocs, doc, deleteDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { fetchAuthorizedUserDetails, fetchUserDetails } from '../services/bookingsData'; // Import the function from bookingData.js
 
-// Updated function to fetch all support documents with user info
-// export const getAllSupportDocuments = async () => {
-//   try {
-//     const supportCollection = collection(db, 'support');
-//     const supportSnapshot = await getDocs(supportCollection);
-//     const supportPromises = supportSnapshot.docs.map(async (doc) => {
-//       const supportData = doc.data();
-//       const userInfo = await fetchAuthorizedUserDetails(supportData.phoneNumber);
-//       return {
-//         id: doc.id,
-//         ...supportData,
-//         userInfo: userInfo || {} // Include user info or an empty object if not found
-//       };
-//     });
-//     const supportList = await Promise.all(supportPromises);
-//     return supportList;
-//   } catch (error) {
-//     console.error('Error fetching support documents:', error);
-//     throw error;
-//   }
-// };
 
-// Updated function to fetch all support documents with user info
-// Updated function to fetch all support documents with user info
 export const getAllSupportDocuments = async () => {
   try {
     const supportCollection = collection(db, 'support');

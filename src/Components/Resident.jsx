@@ -7,7 +7,7 @@ import AddService from '../Components/AddService';
 import ScrollableAdminBookingTable from "./AdminBookingTable";
 import BookingServiceTable from "./BookingServiceTable";
 import { useAuth } from "../context/AuthContext";
-import ExportModal from './expotCustomeDateBooking';
+import ExportModal from './Exports/Resident';
 import EditingBookingModal from "./EditingModal";
 import FlatTable from "./Tables/FlatTable";
 import AddFlat from "./AddFlat";
@@ -16,6 +16,7 @@ import ParcelsTable from "./ParcelsTable";
 import GuestTable from "./GuestTable";
 import UserRequestTable from "./UserRequestTable";
 import ResidentTable from "./ResidentTable";
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 const ResidentMain = () => {
   const [activeTab, setActiveTab] = useState("Amenities");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -75,7 +76,7 @@ const ResidentMain = () => {
             </p>
           </div>
           <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", justifyItems: "flex-end", zIndex: '10'}}>
-            <button
+            {/* <button
               onClick={() => setShowExportModal(true)}
               style={{
                 display: "flex",
@@ -95,7 +96,14 @@ const ResidentMain = () => {
                 </svg>
               </span>
               Export
-            </button>
+            </button> */}
+             <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
             {/* <button onClick={handleAddClick} style={{display: "flex", padding: "12px 24px", justifyContent: "center", alignItems: "center", borderRadius: "10px", fontSize: "16px", fontFamily: "Plus_Jakarta", backgroundColor: "#030712", color: "#fff"}}>
               <span>
                 <svg className="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">

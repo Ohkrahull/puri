@@ -10,6 +10,7 @@ import SingleDatePicker from "./SingleDatePickerForAddBooking";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SetTargetDateModal from "./SetTargetDateModal";
+import { ExportIcon, HighlightButton } from "./HighLightButton";
 
 const Construction = () => {
     const [showExportModal, setShowExportModal] = useState(false);
@@ -94,7 +95,7 @@ const Construction = () => {
               Set Target Date
             </button>
 
-          <button
+          {/* <button
             onClick={() => setShowExportModal(true)}
             style={{
               display: "flex",
@@ -114,7 +115,14 @@ const Construction = () => {
               </svg>
             </span>
             Export 
-          </button>
+          </button> */}
+           <HighlightButton 
+  type="secondary" 
+  onClick={() => setShowExportModal(true)}
+>
+  <ExportIcon />
+  Export
+</HighlightButton>
           <Link to='/constructionupdate'
             style={{
               display: "flex",

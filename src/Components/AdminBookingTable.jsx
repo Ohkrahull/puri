@@ -23,7 +23,6 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 
-// import React, { useState } from 'react';
 
 const SearchInput = ({ bookings, onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -127,9 +126,7 @@ const SearchInput = ({ bookings, onSearch }) => {
   );
 };
 
-// export default SearchInput;
 
-// export default SearchInput;
 
 const ScrollableAdminBookingTable = ({ onEditClick, onDeleteClick,onTabChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
