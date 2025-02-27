@@ -62,12 +62,15 @@ const Dashboard = () => {
         <DashboardMetrics />
       </div>
 
-      <div className="mt-6 rounded-lg overflow-hidden flex justify-around">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* <div>
           <GuestTable/>
         </div> */}
-        <div className="overflow-x-auto flex justify-around gap-[40px]">
+        <div className=" rounded-lg overflow-hidden">
         <GuestDashTable/>
+        </div>
+        <div className=" rounded-lg overflow-hidden">
+        
         {/* <VisitorsComponent/> */}
           <Dashboardbooking bookings={bookings} onEditClick={handleEditClick} onDeleteClick={deleteBooking} />
         </div>

@@ -1365,7 +1365,7 @@ const BookingsTable = ({ onTabChange }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg  flex flex-col border  border-gray-200">
+    <div className="bg-white rounded-lg  flex flex-col h-[500px] border  border-gray-200">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <h2 className="text-[16px] font-semibold mb-1">Recent Bookings</h2>

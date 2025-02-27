@@ -16,22 +16,40 @@ const ProfileDropdown = ({ user, onLogout }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const userLable = user?.roles.admin ? "Admin" : "Staff";
+  const firstInitial = user?.firstName?.charAt(0)?.toUpperCase() || '';
+  const lastInitial = user?.lastName?.charAt(0)?.toUpperCase() || '';
+
+  const formatProperCase = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
+  const firstName = formatProperCase(user?.firstName || '');
+const lastName = formatProperCase(user?.lastName || '');
+
   return (
     <div className="relative" ref={dropdownRef}>
       <div 
         className="flex items-center gap-5 cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="w-[36px] h-[36px] rounded-full bg-purple-500 flex items-center justify-center">
+        {/* <div className="w-[36px] h-[36px]  rounded-full bg-purple-500 flex items-center justify-center">
           <span className="text-white text-[16px]">
             {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
           </span>
+        </div> */}
+        <div className="w-[36px] h-[36px] rounded-full bg-purple-500 flex items-center justify-center overflow-hidden">
+          <span className="text-white text-[16px] font-medium flex items-center justify-center leading-none uppercase">
+            {firstInitial}{lastInitial}
+          </span>
         </div>
+        
         <div className="hidden md:block text-left">
           <p className="text-[14px] font-medium text-gray-700 line-clamp-1">
-            {user?.firstName} {user?.lastName}
+            {firstName} {lastName}
           </p>
-          <p className="text-xs text-gray-500">Admin</p>
+          <p className="text-xs text-gray-500">{userLable}</p>
           {/* <p className="text-xs text-gray-500">Admin</p> */}
         </div>
         <ChevronDown 
