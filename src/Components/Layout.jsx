@@ -528,13 +528,23 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
      
      
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+      {/* <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
         <div className="h-[72px] px-6 flex items-center justify-between">
           <div className="flex items-center gap-5 ml-2 mr-[80px]">
             <Link  to={getFirstAccessibleRoute()} className="flex items-center gap-5">
               <div className="flex items-center gap-3">
                 <img src={Logo} alt="Puri Logo" className="h-13 w-13" />
                 <img src={dashImag} alt="Dashboard" className="h-13 w-13 -ml-1" />
+              </div>
+            </Link>
+          </div> */}
+          <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+        <div className="h-[72px] px-3 sm:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3 sm:gap-5 ml-0 sm:ml-2 mr-2 sm:mr-[80px]">
+            <Link to={getFirstAccessibleRoute()} className="flex items-center gap-3 sm:gap-5">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <img src={Logo} alt="Puri Logo" className="h-10 w-10 sm:h-13 sm:w-13" />
+                <img src={dashImag} alt="Dashboard" className="h-10 w-10 sm:h-13 sm:w-13 -ml-1" />
               </div>
             </Link>
           </div>
