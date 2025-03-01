@@ -5,7 +5,7 @@ const FeedbackForm_Left = ({ feedback }) => {
   if (!feedback) return <div>No Support data available</div>;
 
   return (
-    <div className="flex flex-col w-full max-w-[70vw] p-6 bg-white rounded-xl border border-gray-200">
+    <div className="flex flex-col w-full  p-6 bg-white rounded-xl border border-gray-200">
       {/* Support Information Section */}
       <div className="flex flex-col gap-4">
         <h3 className="text-gray-900 text-lg font-semibold" style={{fontSize:'16px'}}>Prospect Information</h3>

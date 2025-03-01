@@ -55,21 +55,11 @@ const SearchInput = ({ documents, onSearch }) => {
   };
 
   return (
-    <div className="relative">
-      <div style={{
-        display: "flex",
-        padding: "8px 16px",
-        alignItems: "center",
-        justifyContent: "space-between",
-        alignSelf: "stretch",
-        border: "1px solid #D1D5DB",
-        borderRadius: "10px",
-        color: "#6B7280",
-        fontSize: "16px",
-        // fontFamily: "Plus Jakarta Sans, sans-serif",
-        fontFamily:'Plus_Jakarta',
-        width: "300px",
-      }}>
+    <div className="relative w-full sm:w-[250px] md:w-[300px] z-50">
+      <div
+        className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-[14px] sm:text-[14px] font-['Plus_Jakarta']"
+        style={{ fontFamily: "Plus_Jakarta", backgroundColor:'#F3F3F3' }}
+      >
         <input
           type="text"
           placeholder="Search"
@@ -86,7 +76,7 @@ const SearchInput = ({ documents, onSearch }) => {
             fontFamily: "inherit",
           }}
         />
-        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <svg className='mr-1' xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M17.9419 17.0579L14.0302 13.1469C15.1639 11.7858 15.7293 10.0399 15.6086 8.2725C15.488 6.50512 14.6906 4.85229 13.3823 3.65785C12.074 2.46341 10.3557 1.81932 8.58462 1.85957C6.81357 1.89982 5.12622 2.62131 3.87358 3.87395C2.62094 5.12659 1.89945 6.81394 1.8592 8.58498C1.81895 10.356 2.46304 12.0744 3.65748 13.3827C4.85192 14.6909 6.50475 15.4883 8.27214 15.609C10.0395 15.7297 11.7854 15.1643 13.1466 14.0305L17.0575 17.9422C17.1156 18.0003 17.1845 18.0464 17.2604 18.0778C17.3363 18.1092 17.4176 18.1254 17.4997 18.1254C17.5818 18.1254 17.6631 18.1092 17.739 18.0778C17.8149 18.0464 17.8838 18.0003 17.9419 17.9422C17.9999 17.8842 18.046 17.8152 18.0774 17.7394C18.1089 17.6635 18.125 17.5822 18.125 17.5001C18.125 17.4179 18.1089 17.3366 18.0774 17.2607C18.046 17.1849 17.9999 17.1159 17.9419 17.0579ZM3.12469 8.75006C3.12469 7.63754 3.45459 6.55 4.07267 5.62497C4.69076 4.69995 5.56926 3.97898 6.5971 3.55323C7.62493 3.12749 8.75593 3.0161 9.84707 3.23314C10.9382 3.45018 11.9405 3.98591 12.7272 4.77258C13.5138 5.55925 14.0496 6.56153 14.2666 7.65267C14.4837 8.74382 14.3723 9.87482 13.9465 10.9027C13.5208 11.9305 12.7998 12.809 11.8748 13.4271C10.9497 14.0452 9.86221 14.3751 8.74969 14.3751C7.25836 14.3734 5.82858 13.7802 4.77404 12.7257C3.71951 11.6712 3.12634 10.2414 3.12469 8.75006Z" fill="#6B7280"/>
         </svg>
       </div>
@@ -107,9 +97,9 @@ const SearchInput = ({ documents, onSearch }) => {
             >
               <div className="font-medium flex justify-between" style={{fontSize:'14px', color:'#6B7280'}}>
                 {/* {`${document.userInfo?.firstName || ''} ${document.userInfo?.lastName || ''}`} */}
-                {truncateText(`${document.userInfo.firstName} ${document.userInfo.lastName}`, 20)}
+                {truncateText(`${document.userInfo.firstName || "N/A"} ${document.userInfo.lastName || "N/A"}`, 20)}
 
-                <span>{document.userInfo.wing} - {document.userInfo.flatNumber}</span>
+                <span>{document.userInfo.wing || "N/A"} - {document.userInfo.flatNumber || "N/A"}</span>
               </div>
             </div>
           ))}
@@ -915,7 +905,10 @@ const handleDateSort = () => {
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-left font-medium text-gray-900" style={{minWidth: '130px'}}>
           {/* <span className="truncate block" title={displayName}>{truncateText(doc.name, 20)}</span> */}
-          {doc.userInfo?.wing || ''} - {doc.userInfo?.flatNumber || ''}        </td>
+          {getFlatDisplay(doc)}
+          {/* {doc.userInfo?.wing|| "N/A"} - {doc.userInfo?.flatNumber || "N/A"}       
+           </td> */}
+           </td>
         <td className="px-6 py-4 whitespace-nowrap text-left" style={{minWidth: '120px'}}>
             <span
               className={`text-center align-baseline inline-flex px-2 sm:px-4  sm:py-2 mr-auto items-center font-semibold text-xs sm:text-sm leading-none ${
@@ -964,6 +957,23 @@ const handleDateSort = () => {
   
   
   const Status = ['Sort Status', 'Seen', 'Pending'];
+
+  const getFlatDisplay = (userInfo) => {
+    if (!userInfo) return 'N/A';
+    
+    // Check for flats.approved array first
+    if (userInfo.flats?.approved && Array.isArray(userInfo.flats.approved) && userInfo.flats.approved.length > 0) {
+      const flat = userInfo.flats.approved[0]; // Display first approved flat
+      return `${flat.wing || ''} - ${flat.flatNumber || ''}`;
+    }
+    
+    // Fallback to wing and flatNumber directly on userInfo
+    if (userInfo.wing && userInfo.flatNumber) {
+      return `${userInfo.wing} - ${userInfo.flatNumber}`;
+    }
+    
+    return 'N/A';
+  };
   
   return (
     <div className="mt-1 bg-white border rounded-lg overflow-hidden flex flex-col h-full">
@@ -1015,7 +1025,57 @@ const handleDateSort = () => {
         <div className="w-full sm:w-auto mb-4 sm:mb-0">
           <SearchInput documents={documents} onSearch={handleSearch} />
         </div>
-        <div className="w-full sm:w-auto flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
+            <div className="relative w-full sm:w-[242px]  " style={{ position: 'relative', zIndex: 43 }}>
+            {/* <div className="relative" ref={StatusDropdownRef}> */}
+              <button
+                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                className="w-full  flex items-center justify-between px-3 py-4 p-2 bg-[#F3F3F3] border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-[14px]"
+
+              >
+                {selectedStatus}
+                <svg className='mr-0' xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M16.2345 7.06754L9.98453 13.3175C9.92648 13.3756 9.85755 13.4217 9.78168 13.4532C9.7058 13.4847 9.62447 13.5008 9.54234 13.5008C9.46021 13.5008 9.37888 13.4847 9.303 13.4532C9.22713 13.4217 9.1582 13.3756 9.10015 13.3175L2.85015 7.06754C2.73288 6.95026 2.66699 6.7912 2.66699 6.62535C2.66699 6.4595 2.73288 6.30044 2.85015 6.18316C2.96743 6.06588 3.12649 6 3.29234 6C3.45819 6 3.61725 6.06588 3.73453 6.18316L9.54234 11.9918L15.3502 6.18316C15.4082 6.12509 15.4772 6.07903 15.553 6.0476C15.6289 6.01617 15.7102 6 15.7923 6C15.8745 6 15.9558 6.01617 16.0317 6.0476C16.1075 6.07903 16.1765 6.12509 16.2345 6.18316C16.2926 6.24123 16.3387 6.31017 16.3701 6.38604C16.4015 6.46191 16.4177 6.54323 16.4177 6.62535C16.4177 6.70747 16.4015 6.78879 16.3701 6.86466C16.3387 6.94053 16.2926 7.00947 16.2345 7.06754Z" fill="#6B7280"/>
+                </svg>
+              </button>
+              {isStatusDropdownOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  zIndex: 1000,
+                  marginTop: '8px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  width: '100%',
+                  border: '1px solid #D1D5DB',
+                  color: '#6B7280'
+                }}>
+                  {['Sort Status', 'Seen', 'Pending'].map((status, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '8px 16px',
+                        cursor: 'pointer',
+                        color: 'var(--Gray-400, #6B7280)',
+                        fontSize: '14px',
+                        borderBottom: '1px solid var(--Gray-100, #E5E7EB)'
+                      }}
+                      onClick={() => handleStatusSelect(status)}
+                    >
+                      {status}
+                    </div>
+                  ))}
+                </div>
+              )}
+           {/* </div> */}
+            </div>
+            <div className="w-full sm:w-auto">
+                <SortButton onSort={handleSort} ref={sortDateRef}/>
+              </div>
+            </div>
+        {/* <div className="w-full sm:w-auto ">
           <SortButton onSort={handleSort} ref={sortDateRef} />
           <div className="relative" ref={StatusDropdownRef}>
               <button
@@ -1073,7 +1133,7 @@ const handleDateSort = () => {
                 </div>
               )}
            </div>
-              </div>
+              </div> */}
             </div>
             </div>
             <div className="flex-grow overflow-auto">

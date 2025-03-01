@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 // Staff Users
 
 const COLLECTION_NAME = 'staffUsers';
-const MEMBER_COLLECTION = 'authorizedUsers'; 
+const MEMBER_COLLECTION = 'users'; 
 
 
 
@@ -287,21 +287,6 @@ export const updateStaffUser = async (uid, updates) => {
     if (updates.email) authUpdates.email = updates.email;
     if (updates.password) authUpdates.password = updates.password;
 
-    // Determine primary role if needed for auth update
-    if (updates.roles) {
-      let primaryRole = 'Staff';
-      if (updates.roles.admin) {
-        primaryRole = 'Admin';
-      } else if (updates.roles.bookings) {
-        primaryRole = 'Booking Manager';
-      } else if (updates.roles.documents) {
-        primaryRole = 'Legal Documents';
-      } else if (updates.roles.constructionUpdate) {
-        primaryRole = 'Construction Update';
-      }
-      authUpdates.role = primaryRole;
-    }
-
     if (Object.keys(authUpdates).length > 0) {
       const response = await axios.post('https://puri-dashboard-server.onrender.com/api/update-auth', {
         uid,
@@ -314,8 +299,10 @@ export const updateStaffUser = async (uid, updates) => {
 
       if (response.status === 200) {
         authUpdateSuccess = true;
+        
         console.log('Authentication updated successfully');
       } else {
+        
         throw new Error(response.data.error || 'Failed to update auth credentials');
       }
     } else {
@@ -337,7 +324,14 @@ export const updateStaffUser = async (uid, updates) => {
     const dbUpdates = { ...updates, authUID: uid };
     delete dbUpdates.password; // Don't store password in Firestore
     
-    // No need to transform roles - they're already in the correct format
+    if (dbUpdates.roles) {
+      dbUpdates.roles = {
+        admin: dbUpdates.roles.includes('admin'),
+        booking: dbUpdates.roles.includes('booking'),
+        documents: dbUpdates.roles.includes('documents'),
+        constructionUpdate: dbUpdates.roles.includes('constructionUpdate')
+      };
+    }
 
     await setDoc(userRef, dbUpdates, { merge: true });
     firestoreUpdateSuccess = true;
@@ -357,84 +351,6 @@ export const updateStaffUser = async (uid, updates) => {
     };
   }
 };
-// export const updateStaffUser = async (uid, updates) => {
-//   if (!uid || typeof uid !== 'string' || uid.length > 128) {
-//     throw new Error('Invalid user UID provided');
-//   }
-
-//   let authUpdateSuccess = false;
-//   let firestoreUpdateSuccess = false;
-
-//   try {
-//     // Update Authentication
-//     const authUpdates = {};
-//     if (updates.email) authUpdates.email = updates.email;
-//     if (updates.password) authUpdates.password = updates.password;
-
-//     if (Object.keys(authUpdates).length > 0) {
-//       const response = await axios.post('https://puri-dashboard-server.onrender.com/api/update-auth', {
-//         uid,
-//         ...authUpdates
-//       }, {
-//         headers: {
-//           'Content-Type': 'application/json',
-//         }
-//       });
-
-//       if (response.status === 200) {
-//         authUpdateSuccess = true;
-        
-//         console.log('Authentication updated successfully');
-//       } else {
-        
-//         throw new Error(response.data.error || 'Failed to update auth credentials');
-//       }
-//     } else {
-//       authUpdateSuccess = true; // No auth updates needed
-//     }
-
-//     // Update Firestore
-//     const userQuery = query(collection(db, COLLECTION_NAME), where("authUID", "==", uid));
-//     const userSnapshot = await getDocs(userQuery);
-
-//     let userRef;
-//     if (userSnapshot.empty) {
-//       console.warn('User not found in Firestore, creating new document');
-//       userRef = doc(collection(db, COLLECTION_NAME));
-//     } else {
-//       userRef = doc(db, COLLECTION_NAME, userSnapshot.docs[0].id);
-//     }
-    
-//     const dbUpdates = { ...updates, authUID: uid };
-//     delete dbUpdates.password; // Don't store password in Firestore
-    
-//     if (dbUpdates.roles) {
-//       dbUpdates.roles = {
-//         admin: dbUpdates.roles.includes('admin'),
-//         booking: dbUpdates.roles.includes('booking'),
-//         documents: dbUpdates.roles.includes('documents'),
-//         constructionUpdate: dbUpdates.roles.includes('constructionUpdate')
-//       };
-//     }
-
-//     await setDoc(userRef, dbUpdates, { merge: true });
-//     firestoreUpdateSuccess = true;
-//     console.log('Firestore updated successfully');
-
-//     return { 
-//       message: 'Staff user updated successfully',
-//       authUpdateSuccess,
-//       firestoreUpdateSuccess
-//     };
-//   } catch (error) {
-//     console.error('Error updating staff user:', error);
-//     return {
-//       error: error.message,
-//       authUpdateSuccess,
-//       firestoreUpdateSuccess
-//     };
-//   }
-// };
 
 // export const removeStaffUser = async (userId) => {
 //   await deleteDoc(doc(db, COLLECTION_NAME, userId));
@@ -575,7 +491,7 @@ export const loginUser = async (email, password) => {
   }
 };
 // Authorized Users
-const AUTHORIZED_USERS_COLLECTION = 'authorizedUsers';
+const AUTHORIZED_USERS_COLLECTION = 'users';
 
 export const addAuthorizedUser = async (userData) => {
   const { email, firstName, lastName, phoneNumber } = userData;
@@ -597,7 +513,7 @@ export const addAuthorizedUser = async (userData) => {
 
 export const getAuthorizedUserData = async (phoneNumber) => {
     try {
-      const userRef = doc(db, 'authorizedUsers', phoneNumber);
+      const userRef = doc(db, 'users', phoneNumber);
       const userDoc = await getDoc(userRef);
   
       if (userDoc.exists()) {
@@ -621,7 +537,7 @@ export const getAuthorizedUserData = async (phoneNumber) => {
 
 export const deleteAuthorizedUser = async (phoneNumber) => {
     try {
-      const userRef = doc(db, 'authorizedUsers', phoneNumber);
+      const userRef = doc(db, 'users', phoneNumber);
       await deleteDoc(userRef);
       console.log(`Authorized user with phone number ${phoneNumber} has been deleted successfully.`);
     } catch (error) {

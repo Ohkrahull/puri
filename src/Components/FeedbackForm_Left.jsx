@@ -59,7 +59,7 @@ const FeedbackForm_Left = ({feedback}) => {
           }
         `}
       </style>
-      <div className="flex flex-col w-full max-w-[70vw] h-[600px] items-start gap-4 sm:gap-6 p-4 sm:p-6 rounded-xl border border-gray-200 bg-white scrollable-container">
+      <div className="flex flex-col w-full  h-[600px] items-start gap-4 sm:gap-6 p-4 sm:p-6 rounded-xl border border-gray-200 bg-white scrollable-container">
         <div className="w-full">
           <h3 className="text-gray-900 font-medium text-sm sm:text-base mb-3" style={{fontSize:'16px'}}>1. How would you rate your overall experience living in our community?</h3>
           <StarRating rating={feedback.relationship} />

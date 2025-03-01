@@ -804,7 +804,7 @@ const GuardRegistrationForm = () => {
     );
   }
   return (
-    <div className="p-8 ml-6">
+    <div className="p-2 lg:p-0 lg:ml-10">
       {/* Back Button */}
       <div className="mb-8">
         <div 
@@ -818,7 +818,7 @@ const GuardRegistrationForm = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,0.8fr] gap-8">
         {/* Left Side - Guard Information */}
-        <div className="bg-white rounded-[12px] p-10 border border-[#E5E7EB]">
+        <div className="bg-white rounded-[12px] p-4 border border-[#E5E7EB]">
           <h2 className="text-[16px] text-[#121212] font-medium mb-8">
             {id ? 'Edit Guard Information' : 'Guard Information'}
           </h2>

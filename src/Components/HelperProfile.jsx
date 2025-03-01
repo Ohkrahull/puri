@@ -66,7 +66,18 @@ const { setSelectedUser, setIsAddingNew } = headerData;
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [dropdownPosition, setDropdownPosition] = useState('bottom');
 
+   // Handle resize events to detect mobile view
+   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   useEffect(() => {
     const fetchData = async () => {
@@ -403,13 +414,13 @@ const { setSelectedUser, setIsAddingNew } = headerData;
       return (
         <div key={documentType}
         style={{target:'Blank'}}
-        onClick={() => handleDownloadDocument(existingDoc.fileUrl, existingDoc.fileName)} className="relative flex items-center gap-3 p-3 bg-white border border-[#E5E7EB] rounded-lg w-[316px] cursor-pointer">
+        onClick={() => handleDownloadDocument(existingDoc.fileUrl, existingDoc.fileName)} className="relative flex items-center gap-3 p-3 bg-white border border-[#E5E7EB] rounded-lg w-full md:w-[316px] cursor-pointer">
           <div className={`h-12 w-12 rounded flex items-center justify-center text-white font-medium
             ${getFileIcon(existingDoc.fileName) === 'PDF' ? 'bg-red-500' : 
               getFileIcon(existingDoc.fileName) === 'IMG' ? 'bg-blue-500' : 'bg-gray-500'}`}>
             {getFileIcon(existingDoc.fileName)}
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-hidden">
             <p className="text-[#111827] text-sm">{existingDoc.documentName}</p>
             <p className="text-sm text-[#6B7280]">{existingDoc.fileName}</p>
           </div>
@@ -479,10 +490,10 @@ const { setSelectedUser, setIsAddingNew } = headerData;
   }
 
   return (
-    <div className="p-8 ml-6">
+    <div className="p-2 lg:p-0 lg:ml-10">
       <form id="owner-form">
       {/* Back Button */}
-      <div className="mb-8 w-[80px]" style={{
+      <div className="mb-4 md:mb-8" style={{
         // border:'1px solid red'
       }}>
         <div className="flex items-center gap-2 text-[#6B7280] cursor-pointer"
@@ -493,7 +504,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,0.8fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,0.8fr] gap-4 md:gap-8">
         {/* Left Side - Helper Information */}
         <div className="bg-white rounded-[24px] p-10" style={{
             borderRadius: 12,
@@ -501,7 +512,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
         }}>
           <h2 className="text-[16px] text-[#121212] font-medium mb-8">Helper Information</h2>
           
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8">
             {/* Profile Image */}
             <div className="mb-8">
               <label className="text-[12px] text-[#454545] mb-2 block">Profile Image</label>
@@ -513,7 +524,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
             </div>
 
             {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">First name</label>
                 <input
@@ -539,7 +550,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
             </div>
 
             {/* Phone and Flat Fields */}
-            <div className="grid grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-2 gap-6"> */}
               <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">Phone</label>
                 <input
@@ -553,7 +564,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
               </div>
               <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap md:flex-nowrap gap-2">
                   <button 
                   type="button" // Add this
                   onClick={(e) => {
@@ -603,10 +614,10 @@ const { setSelectedUser, setIsAddingNew } = headerData;
                   </button>
                 </div>
               </div>
-            </div>
+            {/* </div> */}
 
             {/* Document Type and Service */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="space-y-1.5 dropdown-container relative">
                 <label className="text-[12px] text-[#6B7280] block">Document Type</label>
                 <button 

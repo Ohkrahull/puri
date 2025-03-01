@@ -58,20 +58,11 @@ const SearchInput = ({ documents, onSearch }) => {
   };
 
   return (
-    <div className="relative w-full sm:w-[250px] md:w-[300px]">
-      <div style={{
-        display: "flex",
-        padding: "8px 16px",
-        alignItems: "center",
-        justifyContent: "space-between",
-        alignSelf: "stretch",
-        border: "1px solid #D1D5DB",
-        borderRadius: "10px",
-        color: "#6B7280",
-        fontSize: "16px",
-        fontFamily: "Plus Jakarta Sans, sans-serif",
-        width: "100%",
-      }}>
+    <div className="relative w-full sm:w-[250px] md:w-[300px] z-50">
+      <div
+        className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-[14px] sm:text-[14px] font-['Plus_Jakarta']"
+        style={{ fontFamily: "Plus_Jakarta", backgroundColor:'#F3F3F3' }}
+      >
         <input
           type="text"
           placeholder="Search"

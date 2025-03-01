@@ -79,6 +79,7 @@ const AddHelperForm = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [documentFile, setDocumentFile] = useState(null);
   const [isDocumentUploading, setIsDocumentUploading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -89,6 +90,16 @@ const AddHelperForm = () => {
     imageUrl: '',
     documents: []
   });
+
+  // Add resize listener for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -271,9 +282,9 @@ const handleDocumentUpload = async (file) => {
   };
 
   return (
-    <div className="p-8 ml-6">
+    <div className="p-4 md:p-6 lg:ml-10">
       {/* Back Button */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <div 
           className="flex items-center gap-2 text-[#6B7280] cursor-pointer w-fit"
           onClick={() => navigate(-1)}
@@ -283,14 +294,14 @@ const handleDocumentUpload = async (file) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,0.8fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,0.8fr] gap-4 md:gap-8">
         {/* Left Side - Helper Information */}
-        <div className="bg-white rounded-[12px] p-10 border border-[#E5E7EB]">
-          <h2 className="text-[16px] text-[#121212] font-medium mb-8">Helper Information</h2>
+        <div className="bg-white rounded-[12px] p-5 md:p-10 border border-[#E5E7EB]">
+          <h2 className="text-[16px] text-[#121212] font-medium mb-6 md:mb-8">Helper Information</h2>
           
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8">
             {/* Profile Image */}
-            <div className="mb-8">
+            <div className="mb-6 md:mb-8">
               <label className="text-[12px] text-[#454545] mb-2 block">Profile Image</label>
               <div className="relative w-24 h-24">
   <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
@@ -321,7 +332,7 @@ const handleDocumentUpload = async (file) => {
             </div>
 
             {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">First name</label>
                 <input
@@ -347,7 +358,7 @@ const handleDocumentUpload = async (file) => {
             </div>
 
             {/* Phone and Flat Fields */}
-            <div className="grid grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-2 gap-6"> */}
               <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">Phone</label>
                 <input
@@ -361,7 +372,7 @@ const handleDocumentUpload = async (file) => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap md:flex-nowrap">
                   <button 
                     onClick={() => setIsModalOpen(true)}
                     className="px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center gap-2 text-[#4B5563] min-w-[100px]"
@@ -400,10 +411,10 @@ const handleDocumentUpload = async (file) => {
                   </button>
                 </div>
               </div>
-            </div>
+            {/* </div> */}
 
             {/* Document Type and Service */}
-            <div className="grid grid-cols-2 gap-6" ref={dropdownRef}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" ref={dropdownRef}>
               <div className="space-y-1.5 relative">
                 <label className="text-[12px] text-[#6B7280] block">Document Type</label>
                 <button 

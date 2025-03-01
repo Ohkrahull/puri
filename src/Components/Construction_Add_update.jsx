@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./CustomScrollbar.module.css";
 import "../App.css";
 import SideBar from "./SideBar";
 import "../index.css";
 import Construction_add_upd from "./Consttuction_add_updat";
 import Construction_add_up_right from "./Construction_add_up_right";
+import { ChevronLeft } from "lucide-react";
 
 const Construction_Add_update = () => {
+
+  const navigate = useNavigate();
   const [leftData, setLeftData] = useState({
     heading: "",
     subText: "",
@@ -58,8 +61,8 @@ const Construction_Add_update = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-x-hidden overflow-y-auto hide-scrollbar">
-          <div className="p-4 sm:p-6 lg:p-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <div className="p-2 lg:p-0 lg:ml-10">
+            {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
               <div>
                 <h1 className={`${styles.customScrollbar} text-gray-900 text-2xl font-bold mb-2`}>
                   Add Update
@@ -74,7 +77,16 @@ const Construction_Add_update = () => {
                 </svg>
                 Back
               </Link>
-            </div>
+            </div> */}
+            <div className="mb-8">
+        <div 
+          className="flex items-center gap-2 text-[#6B7280] cursor-pointer w-fit"
+          onClick={() => navigate(-1)}
+        >
+          <ChevronLeft className="h-7 w-7 bg-[#F3F4F6] p-1.5 rounded" />
+          <span className="text-[16px] font-medium">Back</span>
+        </div>
+      </div>
 
             <div className="w-full rounded-lg overflow-hidden">
               <div className="flex flex-col lg:flex-row justify-between gap-8">

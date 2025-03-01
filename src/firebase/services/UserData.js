@@ -2,11 +2,11 @@ import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, getDoc, ge
 import { getApp } from 'firebase/app';
 
 
-const AUTHORIZED_USERS_COLLECTION = 'authorizedUsers';
+const AUTHORIZED_USERS_COLLECTION = 'users';
 
 // Firestore reference
 const db = getFirestore(getApp());
-const COLLECTION_NAME = 'authorizedUsers';
+const COLLECTION_NAME = 'users';
 
 export const addAuthorizedUser = async (userData) => {
   try {

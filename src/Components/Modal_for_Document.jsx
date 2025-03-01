@@ -435,7 +435,7 @@ const AddDocumentsModal = ({ isOpen, onClose, onDocumentAdded }) => {
   
   return (
     <div className="fixed inset-0 z-50 justify-center bg-black bg-opacity-50 flex items-center" style={{fontFamily:'Plus_Jakarta'}}>
-      <div className="bg-white justify-center rounded-2xl w-[428px] flex flex-col ml-[200px]" style={{fontFamily:'Plus_Jakarta', height: '600px'}}>
+      <div className="bg-white justify-center rounded-2xl w-[428px] flex flex-col " style={{fontFamily:'Plus_Jakarta', height: '600px'}}>
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-5 border-b border-gray-200" style={{fontFamily:'Plus_Jakarta'}}>
           <div style={{ width: '24px', height: '24px' }}></div>

@@ -69,22 +69,11 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
     };
   
     return (
-      <div className="relative">
-        <div
-          style={{
-            display: "flex",
-            padding: "8px 16px",
-            alignItems: "center",
-            justifyContent: "space-between",
-            alignSelf: "stretch",
-            border: "1px solid #D1D5DB",
-            borderRadius: "10px",
-            color: "#6B7280",
-            fontSize: "16px",
-            fontFamily: "Plus Jakarta Sans, sans-serif",
-            width: "300px",
-          }}
-        >
+      <div className="relative w-full sm:w-[250px] md:w-[300px] z-50">
+      <div
+        className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']"
+        style={{ fontFamily: "Plus_Jakarta", backgroundColor:'#F3F3F3' }}
+      >
           <input
             type="text"
             placeholder="Search"
@@ -491,31 +480,19 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
             <div className="w-full sm:w-auto mb-4 sm:mb-0">
               <SearchInput users={users} onSearch={handleSearch} onItemClick={handleItemClick} />
             </div>
-            <div className="w-full sm:w-auto flex items-center space-x-4">
-              <div className="relative" ref={roleDropdownRef} style={{ width: '242px' }}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
+            <div className="relative w-full sm:w-[242px]  " style={{ position: 'relative', zIndex: 43 }}>
+            {/* <div className="w-full sm:w-auto flex items-center space-x-4">
+              <div className="relative" ref={roleDropdownRef} style={{ width: '242px' }}> */}
                 <button 
                   onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                  style={{
-                    display: 'flex',
-                    width: '242px',
-                    padding: '10px 20px 10px 16px',
-                    alignItems: 'center',
-                    gap: '6px',
-                    alignSelf: 'stretch',
-                    borderRadius: '8px',
-                    border: '1px solid var(--Gray-200, #D1D5DB)',
-                    color: '#6B7280',
-                    fontSize: '16px',
-                    fontFamily: 'Plus Jakarta Sans, sans-serif',
-                    cursor: 'pointer',
-                    backgroundColor: 'white',
-                    height: '50px'
-                  }}
+                  className="w-full  flex items-center justify-between px-4 py-4 p-2 bg-[#F3F3F3] border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-base"
+
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M6.19254 10.3078C6.25065 10.3659 6.29674 10.4348 6.3282 10.5107C6.35965 10.5865 6.37584 10.6679 6.37584 10.75C6.37584 10.8321 6.35965 10.9135 6.3282 10.9893C6.29674 11.0652 6.25065 11.1341 6.19254 11.1922L3.69254 13.6922C3.63449 13.7503 3.56556 13.7964 3.48969 13.8279C3.41381 13.8593 3.33248 13.8755 3.25035 13.8755C3.16821 13.8755 3.08688 13.8593 3.01101 13.8279C2.93514 13.7964 2.86621 13.7503 2.80816 13.6922L0.30816 11.1922C0.250091 11.1341 0.204028 11.0652 0.172602 10.9893C0.141175 10.9134 0.125 10.8321 0.125 10.75C0.125 10.6679 0.141175 10.5866 0.172602 10.5107C0.204028 10.4348 0.250091 10.3659 0.30816 10.3078C0.425435 10.1905 0.584495 10.1247 0.750347 10.1247C0.832469 10.1247 0.913787 10.1408 0.989658 10.1723C1.06553 10.2037 1.13447 10.2497 1.19253 10.3078L2.62535 11.7414V0.750003C2.62535 0.584243 2.6912 0.425272 2.80841 0.308062C2.92562 0.190852 3.08459 0.125003 3.25035 0.125003C3.41611 0.125003 3.57508 0.190852 3.69229 0.308062C3.8095 0.425272 3.87535 0.584243 3.87535 0.750003V11.7414L5.30816 10.3078C5.36621 10.2497 5.43514 10.2036 5.51101 10.1722C5.58688 10.1407 5.66821 10.1245 5.75035 10.1245C5.83248 10.1245 5.91381 10.1407 5.98969 10.1722C6.06556 10.2036 6.13449 10.2497 6.19254 10.3078ZM13.6925 2.80782L11.1925 0.307816C11.1345 0.249706 11.0656 0.203606 10.9897 0.172154C10.9138 0.140701 10.8325 0.124512 10.7503 0.124512C10.6682 0.124512 10.5869 0.140701 10.511 0.172154C10.4351 0.203606 10.3662 0.249706 10.3082 0.307816L7.80816 2.80782C7.69088 2.92509 7.625 3.08415 7.625 3.25C7.625 3.41586 7.69088 3.57492 7.80816 3.69219C7.92544 3.80947 8.0845 3.87535 8.25035 3.87535C8.4162 3.87535 8.57526 3.80947 8.69254 3.69219L10.1253 2.2586V13.25C10.1253 13.4158 10.1912 13.5747 10.3084 13.6919C10.4256 13.8092 10.5846 13.875 10.7503 13.875C10.9161 13.875 11.0751 13.8092 11.1923 13.6919C11.3095 13.5747 11.3753 13.4158 11.3753 13.25V2.2586L12.8082 3.69219C12.9254 3.80947 13.0845 3.87535 13.2503 3.87535C13.4162 3.87535 13.5753 3.80947 13.6925 3.69219C13.8098 3.57492 13.8757 3.41586 13.8757 3.25C13.8757 3.08415 13.8098 2.92509 13.6925 2.80782Z" fill="#6B7280"/>
                   </svg>
-                  <span style={{ flexGrow: 1, textAlign: 'left' }}>{selectedRole}</span>
+                  <span className='ml-5'  style={{ flexGrow: 1, textAlign: 'left' }}>{selectedRole}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M16.2345 7.06754L9.98453 13.3175C9.92648 13.3756 9.85755 13.4217 9.78168 13.4532C9.7058 13.4847 9.62447 13.5008 9.54234 13.5008C9.46021 13.5008 9.37888 13.4847 9.303 13.4532C9.22713 13.4217 9.1582 13.3756 9.10015 13.3175L2.85015 7.06754C2.73288 6.95026 2.66699 6.7912 2.66699 6.62535C2.66699 6.4595 2.73288 6.30044 2.85015 6.18316C2.96743 6.06588 3.12649 6 3.29234 6C3.45819 6 3.61725 6.06588 3.73453 6.18316L9.54234 11.9918L15.3502 6.18316C15.4082 6.12509 15.4772 6.07903 15.553 6.0476C15.6289 6.01617 15.7102 6 15.7923 6C15.8745 6 15.9558 6.01617 16.0317 6.0476C16.1075 6.07903 16.1765 6.12509 16.2345 6.18316C16.2926 6.24123 16.3387 6.31017 16.3701 6.38604C16.4015 6.46191 16.4177 6.54323 16.4177 6.62535C16.4177 6.70747 16.4015 6.78879 16.3701 6.86466C16.3387 6.94053 16.2926 7.00947 16.2345 7.06754Z" fill="#6B7280"/>
                   </svg>
@@ -555,9 +532,7 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
                   </div>
                 )}
               </div>
-              <button className='flex text-end justify-end ml-[10px]' style={{display:'flex',padding:'8px 16px', justifyContent:'center', alignItems:'center', border:'1px solid #D1D5DB',borderRadius:'10px', color:'#6B7280', fontSize:'16px', fontFamily:'Plus Jakarta Sans, sans-serif'}}>
-                Filter
-              </button>
+             
             </div>
           </div>
         </div>

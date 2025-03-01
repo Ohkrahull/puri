@@ -2,7 +2,7 @@ import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnap
 import { getApp } from 'firebase/app';
 
 const BOOKINGS_COLLECTION = 'bookings';
-const AUTHORIZED_USERS_COLLECTION = 'authorizedUsers';
+const AUTHORIZED_USERS_COLLECTION = 'users';
 const GUEST_USERS_COLLECTION = 'guestUsers';
 const db = getFirestore(getApp());
 

@@ -9,6 +9,7 @@ import ConstructionrightEdit from "./constrcutionRightEdit";
 import { toast } from 'react-toastify';
 import { fetchConstructionUpdates, editConstructionUpdate } from '../firebase/services/constructionUpdate';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ChevronLeft } from 'lucide-react';
 
 const ConstructionEdit = () => {
   const { id } = useParams();
@@ -142,9 +143,9 @@ const handleFormSubmit = async () => {
     }
 
     return (
-        <>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <div>
+        <div className='flex-1 overflow-x-hidden overflow-y-auto hide-scrollbar mt-0' >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 mt-0">
+            {/* <div>
               <h1 className={`${styles.customScrollbar} text-gray-900 text-2xl font-bold mb-2`}>
                 Edit Update
               </h1>
@@ -157,7 +158,16 @@ const handleFormSubmit = async () => {
                 <path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path>
               </svg>
               Back
-            </Link>
+            </Link> */}
+            <div className="mb-2">
+        <div 
+          className="flex items-center gap-2 text-[#6B7280] cursor-pointer w-fit"
+          onClick={() => navigate(-1)}
+        >
+          <ChevronLeft className="h-7 w-7 bg-[#F3F4F6] p-1.5 rounded" />
+          <span className="text-[16px] font-medium">Back</span>
+        </div>
+      </div>
           </div>
   
           <div className="w-full rounded-lg overflow-hidden">
@@ -176,7 +186,7 @@ const handleFormSubmit = async () => {
               </div>
             </div>
           </div>
-        </>
+        </div>
       );
     };
   

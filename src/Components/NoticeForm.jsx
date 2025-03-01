@@ -477,7 +477,7 @@ const NoticeForm = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto lg:ml-4 lg:p-4">
       <div className="mb-8">
         <Link to="/notices" className="flex items-center text-gray-600 mb-6">
           <ChevronLeft

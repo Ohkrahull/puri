@@ -41,7 +41,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-8 lg:p-12 ml-5" >
+    <div className="p-2 ml-15 lg:p-0 lg:ml-10" >
       <h1 className={`${styles.customScrollbar} flex-1 text-gray-900`}
           style={{
             fontWeight: "bold",

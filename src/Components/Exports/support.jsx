@@ -210,7 +210,7 @@ const SupportExportModal = ({ onClose }) => {
                 readOnly
               />
               {showFromCalendar && (
-                <div className="absolute top-0 left-[calc(100%+16px)] bg-white shadow-lg rounded-lg z-10">
+                <div className="absolute top-[0px] left-[20px] bg-white shadow-lg rounded-lg z-10">
                   <SingleDatePicker onDateSelect={handleFromDateSelect} />
                 </div>
               )}
@@ -229,7 +229,7 @@ const SupportExportModal = ({ onClose }) => {
                 readOnly
               />
               {showToCalendar && (
-                <div className="absolute top-0 left-[calc(100%+16px)] bg-white shadow-lg rounded-lg z-10">
+                <div className="absolute top-[0px] right-0 bg-white shadow-lg rounded-lg z-10">
                   <SingleDatePicker onDateSelect={handleToDateSelect} />
                 </div>
               )}

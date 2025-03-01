@@ -152,15 +152,16 @@ const SortButton = forwardRef(({ onSort }, ref) => {
     }
   }));
   return (
-    <div ref={buttonRef}  style={{ position: 'relative', zIndex: 40 ,}}>
+    <div ref={buttonRef} className='sm:w-[250px] md:w-[300px]'  style={{ position: 'relative', zIndex: 40 ,}}>
       <button 
         ref={buttonRef}
         onClick={toggleOptions}
+        className='sm:py-4 p-3 sm:w-[300px] sm:justify-between w-full md:w-[300px] flex items-center justify-between text-base '
         style={{
-          display: 'flex',
-          width: getButtonWidth(),
-          minWidth: '242px', // Ensure a minimum width
-          padding: '12px 16px',
+          // display: 'flex',
+          // width: getButtonWidth(),
+          // minWidth: '242px', // Ensure a minimum width
+          // padding: '12px 16px',
           alignItems: 'center',
           justifyContent: 'space-between',
           border: '1px solid #D1D5DB',
@@ -169,7 +170,7 @@ const SortButton = forwardRef(({ onSort }, ref) => {
           fontSize: '16px',
           // fontFamily: 'Plus Jakarta Sans, sans-serif',
           fontFamily:'Plus_Jakarta',
-          marginLeft:'10px',
+          // marginLeft:'10px',
           background: '#F3F3F3',
           cursor: 'pointer',
           zIndex: 40,

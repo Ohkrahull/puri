@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Search, BellRing, HelpCircle, ChevronDown, Save, Loader } from 'lucide-react';
+import { Search, BellRing, HelpCircle, ChevronDown, Save, Loader, Menu, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useHeader } from '../context/HeaderContext';
 import Logo from "../Images/logo.png";
@@ -45,9 +45,7 @@ const Layout = ({ children }) => {
   console.log("User Data", user);
   
   const { isFormEditing, formDirty, setFormDirty,startSave , endSave, headerData } = useHeader();
-  // const [visitorsOpen, setVisitorsOpen] = useState(false);
-  // const [rentalOpen, setRentalOpen] = useState(false);
-  // const [userOpen, setUserOpen] = useState(false);
+ 
   const [isSaving, setIsSaving] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const isOnFlatNoForm = location.pathname === '/FlatNoForm';
@@ -59,17 +57,37 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     isHelperProfile;
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const isTablet = windowWidth >= 540 && windowWidth < 768; // Define tablet range
+const isMobile = windowWidth < 540;
+const isTabletOrMobile = windowWidth < 600;
   // Get current path
   const currentPath = location.pathname;
 
+  useEffect(() => {
+    // Close sidebar when route changes (but only on mobile/tablet)
+    if (isTabletOrMobile && sidebarOpen) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]); // This will trigger when the path changes
+  
   // References for dropdown content elements to measure heights
   const visitorsRef = useRef(null);
   const rentalRef = useRef(null);
   const userRef = useRef(null);
 
     // Automatically determine which dropdowns should be open based on the current path
+    // const [visitorsOpen, setVisitorsOpen] = useState(
+    //   currentPath.includes('/Guest') || 
+    //   currentPath.includes('/Helper') || 
+    //   currentPath.includes('/Delivery') || 
+    //   currentPath.includes('/Cab') || 
+    //   currentPath.includes('/Other')
+    // );
     const [visitorsOpen, setVisitorsOpen] = useState(
-      currentPath.includes('/Guest') || 
+      currentPath.includes('/Guest/') || 
+      currentPath === '/Guest' ||
       currentPath.includes('/Helper') || 
       currentPath.includes('/Delivery') || 
       currentPath.includes('/Cab') || 
@@ -81,10 +99,17 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
       currentPath.includes('/Tenant')
     );
 
+    // const [userOpen, setUserOpen] = useState(
+    //   currentPath.includes('/Resident') || 
+    //   currentPath.includes('/user') || 
+    //   currentPath.includes('/GuestLogin') || 
+    //   currentPath.includes('/AddGuard') || 
+    //   currentPath.includes('/AddHelper')
+    // );
     const [userOpen, setUserOpen] = useState(
       currentPath.includes('/Resident') || 
-      currentPath.includes('/user') || 
-      currentPath.includes('/GuestLogin') || 
+      currentPath === '/user' ||
+      currentPath === '/GuestLogin' || // Exact match
       currentPath.includes('/AddGuard') || 
       currentPath.includes('/AddHelper')
     );
@@ -92,11 +117,17 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     // Update dropdown states when route changes
   useEffect(() => {
     setVisitorsOpen(
-      currentPath.includes('/Guest') || 
-      currentPath.includes('/Helper') || 
-      currentPath.includes('/Delivery') || 
-      currentPath.includes('/Cab') || 
-      currentPath.includes('/Other')
+      // currentPath.includes('/Guest') || 
+      // currentPath.includes('/Helper') || 
+      // currentPath.includes('/Delivery') || 
+      // currentPath.includes('/Cab') || 
+      // currentPath.includes('/Other')
+      currentPath === '/Guest' ||
+    currentPath.includes('/Guest/') || 
+    currentPath.includes('/Helper') || 
+    currentPath.includes('/Delivery') || 
+    currentPath.includes('/Cab') || 
+    currentPath.includes('/Other')
     );
     
     setRentalOpen(
@@ -105,11 +136,16 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     );
     
     setUserOpen(
+      // currentPath.includes('/Resident') || 
+      // currentPath.includes('/user') || 
+      // currentPath.includes('/GuestLogin') || 
+      // currentPath.includes('/AddGuard') || 
+      // currentPath.includes('/AddHelper')
       currentPath.includes('/Resident') || 
-      currentPath.includes('/user') || 
-      currentPath.includes('/GuestLogin') || 
-      currentPath.includes('/AddGuard') || 
-      currentPath.includes('/AddHelper')
+    currentPath === '/user' ||
+    currentPath === '/GuestLogin' || // Exact match
+    currentPath.includes('/AddGuard') || 
+    currentPath.includes('/AddHelper')
     );
   }, [currentPath]);
 
@@ -201,59 +237,7 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     }
   }, [currentPath, user, navigate]);
 
-  // useEffect(() => {
-  //   const currentPath = location.pathname;
-    
-  //   // Map of paths to their corresponding permission keys
-  //   const pathPermissions = {
-  //     '/': 'dashboard',
-  //     '/flatmain': 'flatManagement',
-  //     '/UserRequests': 'userRequests',
-  //     '/Facility': 'facility',
-  //     '/Booking': 'bookings',
-  //     '/Guest': 'visitors',
-  //     '/Helper': 'visitors',
-  //     '/Delivery': 'visitors',
-  //     '/Cab': 'visitors',
-  //     '/Other': 'visitors',
-  //     '/Parcels': 'parcels',
-  //     '/Notices': 'notices',
-  //     '/sosHistory': 'sosHistory',
-  //     '/feedback': 'feedback',
-  //     '/special_request': 'specialRequest',
-  //     '/Owner': 'rentalRequest',
-  //     '/Tenant': 'rentalRequest',
-  //     '/document': 'documents',
-  //     '/construction': 'constructionUpdate',
-  //     '/Resident': 'users',
-  //     '/user': 'users',
-  //     '/GuestLogin': 'users',
-  //     '/AddGuard': 'users',
-  //     '/AddHelper': 'users',
-  //     '/Referrals': 'referrals',
-  //     '/support': 'support'
-  //   };
-    
-  //   // Special case for home route
-  //   if (currentPath === '/') {
-  //     if (!hasAccess('dashboard')) {
-  //       navigate(getFirstAccessibleRoute());
-  //     }
-  //     return;
-  //   }
-    
-  //   // For other routes, check if the user has access
-  //   const requiredPermission = pathPermissions[currentPath];
-  //   if (requiredPermission && !hasAccess(requiredPermission)) {
-  //     // User doesn't have access, redirect to first accessible route
-  //     navigate(getFirstAccessibleRoute());
-  //   }
-  // }, [location.pathname, user]);
-
-  // Check if a path is active -
-
-
-  // Keyboard shortcut for search
+  
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === 'k') {
@@ -268,14 +252,32 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     };
   }, []);
 
+  
+
+  // const isActive = (path) => {
+  //   if (path === '/') {
+  //     // For home path, only exact match
+  //     return location.pathname === path ? "bg-gray-100" : "";
+  //   }
+    
+  //   // For other paths, check if current path starts with this path
+  //   return location.pathname.startsWith(path) ? "bg-gray-100" : "";
+  // };
   const isActive = (path) => {
     if (path === '/') {
       // For home path, only exact match
       return location.pathname === path ? "bg-gray-100" : "";
     }
     
-    // For other paths, check if current path starts with this path
-    return location.pathname.startsWith(path) ? "bg-gray-100" : "";
+    // Special case for Guest vs GuestLogin to prevent conflicts
+    if (path === '/Guest' && location.pathname.includes('/GuestLogin')) {
+      return ""; // Don't highlight Guest when on GuestLogin
+    }
+    
+    // For other paths, check if current path exactly matches or starts with this path + /
+    return (location.pathname === path || 
+           (location.pathname.startsWith(path + '/') && location.pathname !== '/GuestLogin')) 
+           ? "bg-gray-100" : "";
   };
 
   const toggleSidebar = () => {
@@ -292,6 +294,14 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
 
   const toggleUser = () => {
     setUserOpen(!userOpen);
+  };
+
+   // Determine icon size based on screen width
+   const getIconSize = () => {
+    if (isMobile) {
+      return 26; // Larger icon size for mobile
+    }
+    return 24; // Regular size for desktop
   };
 
   // const handleSave = async () => {
@@ -364,12 +374,7 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     form.dispatchEvent(saveEvent);
   };
 
-  // const handleDiscard = () => {
-  //   if (window.confirm('Are you sure you want to discard changes? All unsaved changes will be lost.')) {
-  //     setFormDirty(false);
-  //     navigate('/flatmain');
-  //   }
-  // };
+  
   const handleDiscard = () => {
     if (window.confirm('Are you sure you want to discard changes? All unsaved changes will be lost.')) {
       setFormDirty(false);
@@ -520,6 +525,57 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
     );
   };
 
+const renderUserProfileInSidebar = () => {
+  if (!user) return null;
+
+  // Format user role label
+  const userRoleLabel = user?.roles?.admin ? "Admin" : "Staff";
+
+  // Format first name and last name
+  const formatProperCase = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
+  const firstName = formatProperCase(user?.firstName || '');
+  const lastName = formatProperCase(user?.lastName || '');
+  
+  // Get first initials for the avatar
+  const firstInitial = user?.firstName?.charAt(0)?.toUpperCase() || '';
+  const lastInitial = user?.lastName?.charAt(0)?.toUpperCase() || '';
+
+  return (
+    <div className="mt-auto mb-4 px-4">
+      <div className="border-t border-gray-200 pt-4">
+        <div className="flex items-center px-2 py-3">
+          <div className="w-[40px] h-[40px] rounded-full bg-purple-500 flex items-center justify-center overflow-hidden">
+            <span className="text-white text-lg font-medium flex items-center justify-center leading-none">
+              {firstInitial}{lastInitial}
+            </span>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-700 line-clamp-1">
+              {firstName} {lastName}
+            </p>
+            <p className="text-xs text-gray-500">{userRoleLabel}</p>
+          </div>
+        </div>
+        
+        <button 
+          onClick={() => {
+            logout();
+            toast.success("Logged out successfully");
+            navigate('/login');
+          }}
+          className="mt-2 flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded-lg"
+        >
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
+};
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "Plus_Jakarta" }}>
@@ -539,20 +595,50 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
             </Link>
           </div> */}
           <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-        <div className="h-[72px] px-3 sm:px-6 flex items-center justify-between">
+        <div className="h-[72px] px-4 sm:px-5 flex items-center justify-between">
           <div className="flex items-center gap-3 sm:gap-5 ml-0 sm:ml-2 mr-2 sm:mr-[80px]">
-            <Link to={getFirstAccessibleRoute()} className="flex items-center gap-3 sm:gap-5">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <img src={Logo} alt="Puri Logo" className="h-10 w-10 sm:h-13 sm:w-13" />
-                <img src={dashImag} alt="Dashboard" className="h-10 w-10 sm:h-13 sm:w-13 -ml-1" />
+            {/* <Link to={getFirstAccessibleRoute()} className="flex items-center gap-3 sm:gap-5">
+              <div className="flex items-center gap-2 sm:gap-2">
+                <img src={Logo} alt="Puri Logo" className="h-12 w-12 sm:h-16 sm:w-16" />
+                <img src={dashImag} alt="Dashboard" className="h-12 w-12 sm:h-16 sm:w-16" />
               </div>
-            </Link>
+            </Link> */}
+            <div className="flex items-center gap-3">
+            {/* Mobile menu toggle button integrated with the logo */}
+            {isTabletOrMobile  ? (
+      <>
+        <button
+          onClick={toggleSidebar}
+          type="button"
+          className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          aria-label="Toggle sidebar"
+        >
+          <Menu size={24} />
+        </button>
+        
+        {/* Logo on mobile */}
+        <Link to={getFirstAccessibleRoute()} className="flex items-center gap-1">
+          <img src={Logo} alt="Puri Logo" className="h-12 w-12" />
+          {/* <img src={dashImag} alt="Dashboard" className="h-12 w-12" /> */}
+        </Link>
+      </>
+    ) : (
+      /* Desktop layout - full logo with both images */
+      <Link to={getFirstAccessibleRoute()} className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
+          <img src={Logo} alt="Puri Logo" className="h-14 w-14" />
+          <img src={dashImag} alt="Dashboard" className="h-14 w-14" />
+        </div>
+      </Link>
+    )}
           </div>
+          </div>
+        
 
-          <div className="flex flex-1 items-center justify-end gap-8 ml-16 mr-10">
+          <div className="flex flex-1 items-center justify-end gap-2 lg:gap-8  ml-6 mr-0 sm:ml-8">
             {renderSearchOrSave()}
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
               {/* <button className="p-2 hover:bg-gray-50 rounded-full">
                 <HelpCircle color='#4b5563' size={24}/>
               </button> */}
@@ -565,23 +651,35 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
 </button>
 
-              <div className="h-8 border-l border-gray-200 mx-8"></div>
+              {/* <div className="h-8 border-l border-gray-200 mx-8"></div> */}
 
               
-              <ProfileDropdown 
+              {/* <ProfileDropdown 
     user={user} 
     onLogout={() => {
       logout();
       navigate('/login');
     }} 
-  />
+  /> */}
+   {!isMobile && (
+                <>
+                  <div className="h-8 border-l border-gray-200 mx-2 sm:mx-8"></div>
+                  <ProfileDropdown 
+                    user={user} 
+                    onLogout={() => {
+                      logout();
+                      navigate('/login');
+                    }} 
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       {/* Mobile Menu Button */}
-      <button
+      {/* <button
         onClick={toggleSidebar}
         type="button"
         className="fixed top-20 left-4 inline-flex items-center p-2 mt-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 z-50"
@@ -590,12 +688,15 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
         <svg className="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
           <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" />
         </svg>
-      </button>
+      </button> */}
 
       {/* Sidebar */}
-      <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] min-w-[220px] transition-transform ${
+      {/* <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] min-w-[220px] transition-transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } sm:translate-x-0 bg-white border-r border-gray-100`}>
+      } sm:translate-x-0 bg-white border-r border-gray-100`}> */}
+      <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] min-w-[220px] transition-transform ${
+  sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+} ${isTabletOrMobile ? '' : 'translate-x-0'} bg-white border-r border-gray-100`}>
         <div className={`${styles.customScrollbar} flex flex-col h-full px-2 py-6 overflow-y-auto`}>
           <nav className="flex-grow list-none">
             {/* Admin Dashboard */}
@@ -978,6 +1079,7 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
               </li>
 )}
 
+{isMobile && renderUserProfileInSidebar()}
               
         </nav>
         </div>
@@ -989,11 +1091,18 @@ const isUpdateMode = isHelperProfile && location.pathname.includes('/'); // Chec
 />
 
       {/* Main Content */}
-      <main className={`pt-[72px] transition-all duration-300 ${sidebarOpen ? 'sm:ml-64' : 'sm:ml-64 ml-0'}`} >
+      {/* <main className={`pt-[72px] transition-all duration-300 ${sidebarOpen ? 'sm:ml-64' : 'sm:ml-64 ml-0'}`} >
         <div className="p-6" style={{ fontFamily: "Plus_Jakarta" }}>
         <Outlet />
         </div>
-      </main>
+      </main> */}
+      <main className={`pt-[72px] transition-all duration-300 ${
+  sidebarOpen && isTabletOrMobile ? 'ml-0' : ''
+} ${isTabletOrMobile ? 'ml-0' : 'ml-64'}`}>
+  <div className="p-6" style={{ fontFamily: "Plus_Jakarta" }}>
+    <Outlet />
+  </div>
+</main>
     </div>
   );
 };

@@ -40,9 +40,9 @@ const SearchInput = ({ alerts, onSearch }) => {
   };
 
   return (
-    <div className="relative w-full sm:w-[250px] md:w-[300px]">
+    <div className="relative w-full sm:w-[250px] md:w-[300px] z-50" >
       <div
-        className="flex items-center justify-between p-2 sm:py-3 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']"
+        className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']"
         style={{ fontFamily: "Plus_Jakarta", backgroundColor:'#F3F3F3' }}
       >
         <input
@@ -397,7 +397,7 @@ const NoticeTable = () => {
               <SearchInput alerts={alerts} onSearch={handleSearch} />
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
-              <div className="relative w-full sm:w-[242px]" style={{ position: 'relative', zIndex: 40 }}>
+            <div className="relative w-full sm:w-[242px]  " style={{ position: 'relative', zIndex: 43 }}>
                 <button 
                   onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
                   className="w-full h-[50px] flex items-center justify-between px-4 py-2 bg-[#F3F3F3] border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-base"

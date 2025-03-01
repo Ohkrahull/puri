@@ -67,10 +67,10 @@ const SearchInput = ({ bookings, onSearch }) => {
   };
 
   return (
-    <div className="relative w-full sm:w-[250px] md:w-[300px]">
+    <div className="relative w-full sm:w-[250px] md:w-[300px] z-50" >
       <div
-        className="flex items-center justify-between p-2 sm:py-3 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']"
-        style={{ fontFamily: "Plus_Jakarta" }}
+        className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']"
+        style={{ fontFamily: "Plus_Jakarta", backgroundColor:'#F3F3F3' }}
       >
         <input
           type="text"
@@ -987,6 +987,23 @@ const handleSaveBooking = async (bookingData) => {
     setActiveTab(newTab);
     onTabChange?.(newTab); // Notify parent component
   };
+
+
+  const getFlatInfo = (ticket) => {
+    // Check for nested flats structure (approved flats)
+    if (ticket.userInfo?.flats?.approved && Array.isArray(ticket.userInfo.flats.approved) && ticket.userInfo.flats.approved.length > 0) {
+      return ticket.userInfo.flats.approved.map(flat => 
+        `${flat.wing || ""}-${flat.flatNumber || ""}`
+      ).join(", ");
+    }
+    
+    // If the ticket has specific user info with wing and flatNumber directly
+    if (ticket.userInfo?.wing && ticket.userInfo?.flatNumber) {
+      return `${ticket.userInfo.wing}-${ticket.userInfo.flatNumber}`;
+    }
+    
+    return 'N/A';
+  };
     return (
       <>
        <style>{customScrollbarStyle}</style>
@@ -1011,32 +1028,34 @@ const handleSaveBooking = async (bookingData) => {
             </span>
           ))}
         </div>
-          <div style={headerStyle}>
-            <div style={{ width: windowWidth > 768 ? 'auto' : '100%', marginBottom: windowWidth > 768 ? 0 : '16px' }}>
+        <div className="flex flex-col sm:flex-row items-stretch p-6 gap-4 justify-between">
+            
+            <div className="w-full sm:w-auto">
             <SearchInput
     bookings={bookings}
     onSearch={handleSearch}
   />
             </div>
-            <div className='flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full lg:w-auto'>
-              <div className="relative w-full sm:w-auto" ref={amenityRef} style={{ width: '242px', zIndex: 30 }}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-5   w-full lg:w-auto">
+            <div className="relative w-full sm:w-[242px]  " style={{ position: 'relative', zIndex: 43 }}>
                 <button 
                   onClick={toggleDropdown}
-                  style={{
-                    display: 'flex',
-                    padding: '8px 16px',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    border: '1px solid #D1D5DB',
-                    borderRadius: '10px',
-                    color: '#6B7280',
-                    fontSize: '16px',
-                    fontFamily: 'Plus_Jakarta',
-                    cursor: 'pointer',
-                    backgroundColor: 'white',
-                    width: '100%',
-                    height: '50px'
-                  }}
+                  className="w-full  flex items-center justify-between px-4 py-4 p-2  bg-[#F3F3F3] border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-base"
+                  // style={{
+                  //   display: 'flex',
+                  //   padding: '8px 16px',
+                  //   justifyContent: 'space-between',
+                  //   alignItems: 'center',
+                  //   border: '1px solid #D1D5DB',
+                  //   borderRadius: '10px',
+                  //   color: '#6B7280',
+                  //   fontSize: '16px',
+                  //   fontFamily: 'Plus_Jakarta',
+                  //   cursor: 'pointer',
+                  //   backgroundColor: 'white',
+                  //   width: '100%',
+                  //   height: '50px'
+                  // }}
                 >  <span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M6.19254 10.3078C6.25065 10.3659 6.29674 10.4348 6.3282 10.5107C6.35965 10.5865 6.37584 10.6679 6.37584 10.75C6.37584 10.8321 6.35965 10.9135 6.3282 10.9893C6.29674 11.0652 6.25065 11.1341 6.19254 11.1922L3.69254 13.6922C3.63449 13.7503 3.56556 13.7964 3.48969 13.8279C3.41381 13.8593 3.33248 13.8755 3.25035 13.8755C3.16821 13.8755 3.08688 13.8593 3.01101 13.8279C2.93514 13.7964 2.86621 13.7503 2.80816 13.6922L0.30816 11.1922C0.250091 11.1341 0.204028 11.0652 0.172602 10.9893C0.141175 10.9134 0.125 10.8321 0.125 10.75C0.125 10.6679 0.141175 10.5866 0.172602 10.5107C0.204028 10.4348 0.250091 10.3659 0.30816 10.3078C0.425435 10.1905 0.584495 10.1247 0.750347 10.1247C0.832469 10.1247 0.913787 10.1408 0.989658 10.1723C1.06553 10.2037 1.13447 10.2497 1.19253 10.3078L2.62535 11.7414V0.750003C2.62535 0.584243 2.6912 0.425272 2.80841 0.308062C2.92562 0.190852 3.08459 0.125003 3.25035 0.125003C3.41611 0.125003 3.57508 0.190852 3.69229 0.308062C3.8095 0.425272 3.87535 0.584243 3.87535 0.750003V11.7414L5.30816 10.3078C5.36621 10.2497 5.43514 10.2036 5.51101 10.1722C5.58688 10.1407 5.66821 10.1245 5.75035 10.1245C5.83248 10.1245 5.91381 10.1407 5.98969 10.1722C6.06556 10.2036 6.13449 10.2497 6.19254 10.3078ZM13.6925 2.80782L11.1925 0.307816C11.1345 0.249706 11.0656 0.203606 10.9897 0.172154C10.9138 0.140701 10.8325 0.124512 10.7503 0.124512C10.6682 0.124512 10.5869 0.140701 10.511 0.172154C10.4351 0.203606 10.3662 0.249706 10.3082 0.307816L7.80816 2.80782C7.69088 2.92509 7.625 3.08415 7.625 3.25C7.625 3.41586 7.69088 3.57492 7.80816 3.69219C7.92544 3.80947 8.0845 3.87535 8.25035 3.87535C8.4162 3.87535 8.57526 3.80947 8.69254 3.69219L10.1253 2.2586V13.25C10.1253 13.4158 10.1912 13.5747 10.3084 13.6919C10.4256 13.8092 10.5846 13.875 10.7503 13.875C10.9161 13.875 11.0751 13.8092 11.1923 13.6919C11.3095 13.5747 11.3753 13.4158 11.3753 13.25V2.2586L12.8082 3.69219C12.9254 3.80947 13.0845 3.87535 13.2503 3.87535C13.4162 3.87535 13.5753 3.80947 13.6925 3.69219C13.8098 3.57492 13.8757 3.41586 13.8757 3.25C13.8757 3.08415 13.8098 2.92509 13.6925 2.80782Z" fill="#6B7280"/>
@@ -1186,7 +1205,8 @@ const handleSaveBooking = async (bookingData) => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap" style={{minWidth: '120px'}}>
                       {/* {booking.} */}
-                      <span>{booking.userDetails?.wing || 'N/A'} - {booking.userDetails?.flatNumber || 'N/A'}</span>
+                      {/* <span>{booking.userDetails?.wing || 'N/A'} - {booking.userDetails?.flatNumber || 'N/A'}</span> */}
+                      {getFlatInfo(booking)}
 
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap" style={{minWidth: '150px'}}>

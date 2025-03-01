@@ -1991,7 +1991,7 @@ const handleUserSelection = (user) => {
   const getUserByPhone = async (phone) => {
     try {
       const formattedPhone = formatPhoneForStorage(phone);
-      const userRef = doc(db, 'authorizedUsers', formattedPhone);
+      const userRef = doc(db, 'users', formattedPhone);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
@@ -2027,7 +2027,7 @@ const handleUserSelection = (user) => {
   //         return;
   //       }
   
-  //       // Then check if user exists in authorizedUsers
+  //       // Then check if user exists in users
   //       const existingUser = await getUserByPhone(numbersOnly);
   //       if (existingUser.exists) {
   //         // Auto-fill user details
@@ -2160,7 +2160,7 @@ const handleUserSelection = (user) => {
           return;
         }
   
-        // Then check if user exists in authorizedUsers
+        // Then check if user exists in users
         const existingUser = await getUserByPhone(numbersOnly);
         if (existingUser.exists) {
           // Auto-fill user details
@@ -2366,7 +2366,7 @@ const handleUserSelection = (user) => {
         return;
       }
     }
-      // First create/update user in authorizedUsers collection
+      // First create/update user in users collection
       const userResult = await createAuthorizedUser({
         ...formData,
         phone: formattedPhone // Use formatted phone number
@@ -2504,7 +2504,7 @@ const handleUserSelection = (user) => {
   };
 
   return (
-    <div className="container mx-auto p-2 ml-6">
+    <div className="container mx-auto p-2 lg:ml-8">
       <form id="owner-form">
         {/* Back Button */}
         <div className="mb-8">
@@ -2524,17 +2524,17 @@ const handleUserSelection = (user) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Form */}
+          
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              {/* Form Title */}
+              
               <h2 className="text-[16px] font-medium text-gray-900 mb-6">
                 {getModeText('title')}
               </h2>
 
-              {/* Phone and Email Fields */}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Phone Input */}
+                
                 <div>
                   <label style={labelStyle}>Phone</label>
                   <div style={{ position: "relative", display: "flex" }}>
@@ -2554,7 +2554,7 @@ const handleUserSelection = (user) => {
                         borderBottomLeftRadius: 0
                       }}
                       placeholder="Enter phone number"
-                      disabled={!isAddingNew} // Phone number cannot be changed once added
+                      disabled={!isAddingNew} 
                     />
                   </div>
                   {touched.phone && errors.phone && (
@@ -2562,7 +2562,7 @@ const handleUserSelection = (user) => {
                   )}
                 </div>
 
-                {/* Email Input */}
+               
                 <div>
                   <label style={labelStyle}>Email</label>
                   <input
@@ -2579,7 +2579,7 @@ const handleUserSelection = (user) => {
                 </div>
               </div>
 
-              {/* Name Fields */}
+           
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label style={labelStyle}>First name</label>
@@ -2612,9 +2612,9 @@ const handleUserSelection = (user) => {
                 </div>
               </div>
 
-              {/* Status Toggles */}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Residing Status */}
+               
                 <div>
                   <label style={labelStyle}>Residing status</label>
                   <div className="flex gap-4 mt-2">
@@ -2641,7 +2641,7 @@ const handleUserSelection = (user) => {
                   </div>
                 </div>
 
-                {/* Primary Status */}
+               
                 <div>
                   <label style={labelStyle}>{getModeText('status')}</label>
                   <div className="mt-2">
@@ -2664,7 +2664,7 @@ const handleUserSelection = (user) => {
                 </div>
               </div>
 
-              {/* Notifications Toggle */}
+              
               <div className="mb-8">
                 <label style={labelStyle}>
                   <span>Notifications</span>
@@ -2685,11 +2685,11 @@ const handleUserSelection = (user) => {
                 </span>
               </div>
 
-              {/* Document Upload Section */}
-              <div>
+              
+              {/* <div>
                 <h3 className="text-[16px] font-medium text-gray-900 mb-6">Upload Documents</h3>
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  {/* Header */}
+                 
                   <div className="grid grid-cols-4 px-4 py-3 bg-gray-50 border-b border-gray-200">
                     <div className="font-medium text-[#4B5563]" style={{ fontSize: 12 }}>Name</div>
                     <div className="font-medium text-[#4B5563]" style={{ fontSize: 12 }}>Document Name</div>
@@ -2697,15 +2697,13 @@ const handleUserSelection = (user) => {
                     <div></div>
                   </div>
 
-                  {/* Document Rows */}
                   {documents.map((doc, index) => (
                     <div key={index} className="grid grid-cols-4 px-4 py-3 border-b border-gray-200 items-center">
-                      {/* Name */}
+                      
                       <div className="text-[14px] font-medium text-gray-900">
                         {doc.name}
                       </div>
 
-                      {/* Document Type */}
                       <div className="relative">
                         {doc.type === 'select' ? (
                           <>
@@ -2749,7 +2747,7 @@ const handleUserSelection = (user) => {
                         )}
                       </div>
 
-                      {/* Upload/File Display */}
+                      
                       <div>
                         {doc.file ? (
                           <div className="border border-gray-200 rounded-lg py-3 px-3 flex items-center gap-4 w-[198px] bg-gray-50">
@@ -2777,7 +2775,7 @@ const handleUserSelection = (user) => {
                         )}
                       </div>
 
-                      {/* Delete Button */}
+                      
                       <div className="flex justify-end mr-4">
                         {doc.file && (
                           <button
@@ -2792,7 +2790,215 @@ const handleUserSelection = (user) => {
                     </div>
                   ))}
                 </div>
+              </div> */}
+               <div>
+      <h3 className="text-[16px] font-medium text-gray-900 mb-6">Upload Documents</h3>
+      <div className="border border-gray-200 rounded-lg overflow-hidden">
+        {/* Header - Desktop */}
+        <div className="hidden md:grid md:grid-cols-4 px-4 py-3 bg-gray-50 border-b border-gray-200">
+          <div className="font-medium text-[#4B5563] text-xs">Name</div>
+          <div className="font-medium text-[#4B5563] text-xs">Document Name</div>
+          <div className="font-medium text-[#4B5563] text-xs">Upload</div>
+          <div></div>
+        </div>
+
+        {/* Mobile Header - Only shows on small screens */}
+        <div className="md:hidden px-4 py-3 bg-gray-50 border-b border-gray-200">
+          <div className="font-medium text-[#4B5563] text-xs">Documents</div>
+        </div>
+
+        {/* Document Rows */}
+        {documents.map((doc, index) => (
+          <div key={index} className="border-b border-gray-200">
+            {/* Desktop Layout */}
+            <div className="hidden md:grid md:grid-cols-4 px-4 py-3 items-center">
+              {/* Name */}
+              <div className="text-[14px] font-medium text-gray-900">
+                {doc.name}
               </div>
+
+              {/* Document Type */}
+              <div className="relative">
+                {doc.type === 'select' ? (
+                  <>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveDropdown(activeDropdown === index ? null : index);
+                      }}
+                      className="flex items-center text-gray-700 text-[14px]"
+                    >
+                      {doc.selectedType}
+                      <ChevronDown size={16} className="ml-2" />
+                    </button>
+                    
+                    {activeDropdown === index && (
+                      <div className="absolute z-50 w-48 bg-white rounded-md shadow-lg border border-gray-200">
+                        {doc.options.map((option) => (
+                          <button
+                            type="button"
+                            key={option}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 text-[14px] text-gray-700"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const newDocs = [...documents];
+                              newDocs[index].selectedType = option;
+                              setDocuments(newDocs);
+                              setActiveDropdown(null);
+                              setFormDirty(true);
+                              checkForChanges(formData);
+                            }}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[14px] text-gray-500">{doc.selectedType}</span>
+                )}
+              </div>
+
+              {/* Upload/File Display */}
+              <div>
+                {doc.file ? (
+                  <div className="border border-gray-200 rounded-lg py-3 px-3 flex items-center gap-4 w-[198px] bg-gray-50">
+                    <div className={`w-10 h-9 rounded flex items-center justify-center text-white 
+                      ${doc.file.type === 'PDF' ? 'bg-red-600' : 'bg-blue-600'}`}>
+                      <span className="text-[12px] font-medium">{doc.file.type}</span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 max-w-[130px] truncate">
+                        {doc.file.name}
+                      </div>
+                      <div className="text-xs text-gray-500">{doc.file.size}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="px-3 py-2 bg-gray-50 border border-gray-200 rounded cursor-pointer inline-block text-[14px] text-gray-900 font-medium">
+                    Choose File
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(index, e)}
+                      accept={doc.name === 'Photograph' ? 'image/*' : '.pdf'}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* Delete Button */}
+              <div className="flex justify-end mr-4">
+                {doc.file && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFile(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <TrashSimple size={24} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Layout - Card-like design for each document */}
+            <div className="md:hidden p-4 space-y-4">
+              {/* Name and Delete Button in one row */}
+              <div className="flex justify-between items-center">
+                <div className="text-[16px] font-semibold text-gray-900">
+                  {doc.name}
+                </div>
+                {doc.file && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFile(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <TrashSimple size={20} />
+                  </button>
+                )}
+              </div>
+
+              {/* Document Type */}
+              <div className="relative mb-3">
+                <div className="text-xs text-gray-500 mb-1">Document Name:</div>
+                {doc.type === 'select' ? (
+                  <>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveDropdown(activeDropdown === index ? null : index);
+                      }}
+                      className="flex items-center text-gray-700 text-[14px] border border-gray-200 rounded-md px-3 py-2 w-full bg-white"
+                    >
+                      <span className="flex-1 text-left">{doc.selectedType}</span>
+                      <ChevronDown size={16} />
+                    </button>
+                    
+                    {activeDropdown === index && (
+                      <div className="absolute z-50 w-full bg-white rounded-md shadow-lg border border-gray-200 mt-1">
+                        {doc.options.map((option) => (
+                          <button
+                            type="button"
+                            key={option}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[16px] text-gray-700 border-b border-gray-100 last:border-0"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const newDocs = [...documents];
+                              newDocs[index].selectedType = option;
+                              setDocuments(newDocs);
+                              setActiveDropdown(null);
+                              setFormDirty(true);
+                              checkForChanges(formData);
+                            }}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-[14px] text-gray-700 py-2">{doc.selectedType}</div>
+                )}
+              </div>
+
+              {/* Upload/File Display */}
+              <div>
+                <div className="text-xs text-gray-500 mb-1">Upload:</div>
+                {doc.file ? (
+                  <div className="border border-gray-200 rounded-lg py-3 px-3 flex items-center gap-3 bg-gray-50 w-full">
+                    <div className={`min-w-10 h-9 rounded flex items-center justify-center text-white 
+                      ${doc.file.type === 'PDF' ? 'bg-red-600' : 'bg-blue-600'}`}>
+                      <span className="text-[12px] font-medium">{doc.file.type}</span>
+                    </div>
+                    <div className="overflow-hidden">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {doc.file.name}
+                      </div>
+                      <div className="text-xs text-gray-500">{doc.file.size}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded cursor-pointer flex items-center justify-center text-[14px] text-gray-900 font-medium">
+                    Choose File
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(index, e)}
+                      accept={doc.name === 'Photograph' ? 'image/*' : '.pdf'}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
             </div>
           </div>
 

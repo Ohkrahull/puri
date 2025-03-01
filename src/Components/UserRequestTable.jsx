@@ -40,7 +40,7 @@ const SearchInput = ({ requests, onSearch, userDetails }) => {
     });
   
     return (
-      <div className="relative w-full sm:w-[250px] md:w-[300px]" style={{ fontFamily: 'Plus_Jakarta' }}>
+      <div className="relative w-full sm:w-[250px] md:w-[300px] z-50" style={{ fontFamily: 'Plus_Jakarta' }}>
         <div className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base" style={{ backgroundColor: '#F3F3F3', fontFamily: 'Plus_Jakarta' }}>
           <input
             type="text"
@@ -122,8 +122,8 @@ const FlatRequestsTable = () => {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      const authorizedUsersQuery = query(collection(db, 'authorizedUsers'));
-      const unsubscribe = onSnapshot(authorizedUsersQuery, (snapshot) => {
+      const usersQuery = query(collection(db, 'users'));
+      const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
         const users = {};
         snapshot.docs.forEach(doc => {
           const data = doc.data();

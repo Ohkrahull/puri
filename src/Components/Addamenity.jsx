@@ -568,7 +568,7 @@ const handleSubmit = async (e) => {
   );
 
   return (
-    <div className="container mx-auto p-2 ml-6">
+    <div className="container mx-auto p-2 lg:ml-6">
       {/* Header with Back Button */}
       <style>{getSelectClassName()}</style>
       <div className="mb-8">

@@ -760,7 +760,7 @@ import {
 import { getAuth } from 'firebase/auth';
 
 const db = getFirestore();
-const USERS_COLLECTION = 'authorizedUsers';
+const USERS_COLLECTION = 'users';
 const FLATS_COLLECTION = 'flats';
 
 // Ensure phone number always has +91 prefix

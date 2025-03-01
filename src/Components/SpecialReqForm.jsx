@@ -43,13 +43,13 @@ const SpecialReqForm = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-x-hidden overflow-y-auto hide-scrollbar">
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="p-2 lg:p-0 lg:ml-10">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                <Link to="/special_request" className="flex items-center gap-2 text-[#6B7280] cursor-pointer"
           // onClick={() => navigate(-1)}
         >
           <ChevronLeft className="h-7 w-7 bg-[#F3F4F6] p-1.5 rounded" />
-          <span className="text-base font-medium">Back</span>
+          <span className="text-[16px] font-medium">Back</span>
         </Link>
               {/* <div>
                 <h1 className={`${styles.customScrollbar} text-gray-900 text-2xl font-bold mb-2`}>

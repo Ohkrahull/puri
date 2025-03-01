@@ -42,8 +42,11 @@ const SearchInput = ({ visitors, onSearch,activeTab }) => {
   });
 
   return (
-    <div className="relative w-full sm:w-[250px] md:w-[300px]" style={{  fontFamily: 'Plus_Jakarta' }}>
-      <div className="flex items-center justify-between p-2 sm:py-3 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']" style={{ backgroundColor:'#F3F3F3',fontFamily: 'Plus_Jakarta' }}>
+    <div className="relative w-full sm:w-[250px] md:w-[300px] z-50" >
+    <div
+      className="flex items-center justify-between p-2 sm:py-2 border border-[#D1D5DB] rounded-[10px] text-[#6B7280] text-sm sm:text-base font-['Plus_Jakarta']"
+      style={{ fontFamily: "Plus_Jakarta", backgroundColor:'#F3F3F3' }}
+    >
         <input
           type="text"
           placeholder="Search"
