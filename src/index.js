@@ -9,11 +9,13 @@ import { StaffProvider } from "./context/StaffContext";
 import { HeaderProvider } from "./context/HeaderContext";
 import ImageViewerContext from "./context/ImageViewerContext";
 import { SOSProvider } from "./context/SosContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <AuthProvider>
+      <NotificationProvider>
       <HeaderProvider>
         <ImageViewerContext>
           <StaffProvider>
@@ -23,6 +25,7 @@ root.render(
           </StaffProvider>
         </ImageViewerContext>
       </HeaderProvider>
+      </NotificationProvider>
     </AuthProvider>
   </React.StrictMode>
 );

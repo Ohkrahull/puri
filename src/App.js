@@ -55,6 +55,7 @@ import OwnerMain from './Components/OwnerMain';
 import OwnerDetailsView from './Components/OwnerReqDetails';
 import TenantDetails from './Components/TenantDetails';
 import UserRequestView from './Components/UserRequestView';
+import { initializeFCMToken } from './utils/fcmTokenManager';
 
 // Custom Loader component
 const Loader = () => {
@@ -180,22 +181,29 @@ const PublicRoute = ({ children }) => {
 
 
 function App() {
-
-
- 
+  const authContext = useAuth(); // Get the entire auth context
 
   useEffect(() => {
-    const initFCM = async () => {
+    const setupFCMToken = async () => {
       try {
-        const token = await fcmService.init(process.env.REACT_APP_FIREBASE_VAPID_KEY);
-        console.log('FCM Token:', token);
+        // Check if setupNotifications method exists in the context
+        if (authContext.setupNotifications) {
+          // Use the setupNotifications method from the context
+          await authContext.setupNotifications(authContext.user?.id || authContext.user?.uid);
+        } else {
+          console.error('setupNotifications method not found in auth context');
+        }
       } catch (error) {
-        console.error('FCM Init Error:', error);
+        console.error('FCM Token Setup Error:', error);
       }
     };
-    
-    initFCM();
-  }, []);
+
+    // Only attempt to setup if user is logged in
+    if (authContext.user) {
+      setupFCMToken();
+    }
+  }, [authContext.user, authContext.setupNotifications]);
+
   return (
     <Router>
       <Routes>

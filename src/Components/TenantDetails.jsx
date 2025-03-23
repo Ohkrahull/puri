@@ -284,6 +284,7 @@ import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
+import { sendNotificationToUser } from '../utils/notificationUtils';
 
 const RentalRequestDetails = () => {
   const { id } = useParams();
@@ -330,6 +331,33 @@ const RentalRequestDetails = () => {
     fetchData();
   }, [id, db]);
 
+  // const handleStatus = async (newStatus) => {
+  //   try {
+  //     const docRef = doc(db, 'rentalRequest', id);
+  //     const updates = {
+  //       status: newStatus,
+  //       approvedBy: {
+  //         id: user.uid,
+  //         name: `${user.firstName} ${user.lastName}`,
+  //         email: user.email,
+  //         timestamp: new Date()
+  //       }
+  //     };
+
+  //     await updateDoc(docRef, updates);
+      
+  //     setRentalData(prev => ({
+  //       ...prev,
+  //       status: newStatus,
+  //       approvedBy: updates.approvedBy
+  //     }));
+
+  //     toast.success(`Status updated to ${newStatus} successfully`);
+  //   } catch (error) {
+  //     console.error('Error updating status:', error);
+  //     toast.error('Failed to update status');
+  //   }
+  // };
   const handleStatus = async (newStatus) => {
     try {
       const docRef = doc(db, 'rentalRequest', id);
@@ -343,20 +371,62 @@ const RentalRequestDetails = () => {
         }
       };
 
+      // Update the document
       await updateDoc(docRef, updates);
       
+      // Update local state
       setRentalData(prev => ({
         ...prev,
         status: newStatus,
         approvedBy: updates.approvedBy
       }));
 
+      // Prepare notification details based on status
+      let notificationTitle = '';
+      let notificationBody = '';
+      let notificationType = 'rental_request';
+
+      // Check if phone number exists for sending notification
+      if (rentalData.phoneNumber) {
+        switch (newStatus) {
+          case 'approved':
+            notificationTitle = "Rental Request Approved";
+            notificationBody = `Your rental request has been approved. We'll contact you soon with further details.`;
+            break;
+          case 'rejected':
+            notificationTitle = "Rental Request Rejected";
+            notificationBody = `We regret to inform you that your rental request has been rejected. Please contact support for more information.`;
+            break;
+          case 'pending':
+            notificationTitle = "Rental Request Status Updated";
+            notificationBody = `Your rental request status has been changed to Pending.`;
+            break;
+          default:
+            notificationTitle = "Rental Request Status Update";
+            notificationBody = `Your rental request status has been updated to ${newStatus}.`;
+        }
+
+        // Send notification to the user
+        await sendNotificationToUser(
+          rentalData.phoneNumber,
+          notificationTitle,
+          notificationBody,
+          {
+            type: notificationType,
+            requestId: id,
+            status: newStatus
+          }
+        );
+      }
+
+      // Show success toast
       toast.success(`Status updated to ${newStatus} successfully`);
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Failed to update status');
     }
   };
+
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;

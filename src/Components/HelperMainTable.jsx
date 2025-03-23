@@ -8,6 +8,7 @@ import DeleteModal from '../Modals/DeleteModal';
 import SortButton from '../Buttons/Sortdate';
 import StatusBadge from './StatusBadge';
 import { useImageViewer } from '../context/ImageViewerContext';
+import { useAuth } from '../context/AuthContext';
 
 // // Confirmation Dialog Component
 // const ConfirmationDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
@@ -236,6 +237,7 @@ const HelperTable = () => {
   const db = getFirestore(getApp());
   const sortDateRef = useRef(null);
   const itemsPerPage = 10;
+  const {user} = useAuth();
 
   
 

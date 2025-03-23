@@ -1,6 +1,6 @@
 {
   "short_name": "Puri Velvet Life",
-  "name": "Create React App Sample",
+  "name": "Puri",
   "icons": [
     {
       "src": "logo.png",
@@ -21,5 +21,6 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+ "gcm_sender_id": "103953800507"
 }

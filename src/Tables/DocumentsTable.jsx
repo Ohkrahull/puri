@@ -6,10 +6,12 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import SortButton from '../Buttons/Sortdate';
-import EditingDocumentModal from '../Components/EditingDocumentModal';
+// import EditingDocumentModal from '../Components/EditingDocumentModal';
 import { toast } from 'react-toastify';
 import DeleteModal from '../Modals/DeleteModal';
 import { fetchAuthorizedUserDetails } from '../firebase/services/bookingsData';
+import AddEditDocumentsModal from './AddEditDocuments';
+// import AddEditDocumentsModal from ''
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
@@ -128,277 +130,77 @@ const DocumentTable = ({ onTabChange }) => {
   const [deleteFunction, setDeleteFunction] = useState(null);
   const [dateSortDirection, setDateSortDirection] = useState('desc');
   const [activeTab, setActiveTab] = useState("Agreement");
+  const [documentToEdit, setDocumentToEdit] = useState(null);
 
   const itemsPerPage = 10;
   const StatusDropdownRef = useRef(null);
   const sortDateRef = useRef(null);
 
-
-  // useEffect(() => {
-  //   const fetchDocuments = () => {
-  //     setIsLoading(true);
-  //     const q = query(
-  //       collection(db, 'documents'),
-  //       where('documentType', '==', 'Agreement for sale')
-  //     );
-  
-  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //       const fetchedDocuments = querySnapshot.docs.map(doc => ({
-  //         id: doc.id,
-  //         ...doc.data()
-  //       }));
-        
-  //       // Sort documents by uploadDate in descending order
-  //       const sortedDocuments = fetchedDocuments.sort((a, b) => 
-  //         b.uploadDate.toDate() - a.uploadDate.toDate()
-  //       );
-  
-  //       console.log("fetchdoc", sortedDocuments);
-        
-  //       setDocuments(sortedDocuments);
-  //       setSortedDocuments(sortedDocuments);
-  //       setFilteredDocuments(sortedDocuments);
-  //       setIsLoading(false);
-  //     }, (error) => {
-  //       console.error("Error fetching documents:", error);
-  //       setError("Failed to load documents. Please try again later.");
-  //       setIsLoading(false);
-  //     });
-  
-  //     return () => unsubscribe();
-  //   };
-  
-  //   fetchDocuments();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchDocuments = () => {
+   // New function to fetch user details
+   const fetchUserDetails = async (phoneNumber) => {
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('phoneNumber', '==', phoneNumber));
       
+      const querySnapshot = await getDocs(q);
       
-  //     setIsLoading(true);
-  //     const q = query(
-  //       collection(db, 'documents'),
-  //       where('documentType', '==', 'Agreement for sale')
-  //     );
-  
-  //     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-  //       const fetchedDocumentsPromises = querySnapshot.docs.map(async doc => {
-  //         const documentData = {
-  //           id: doc.id,
-  //           ...doc.data()
-  //         };
-          
-  //         // Fetch user details for each document
-  //         const userDetails = await fetchAuthorizedUserDetails(documentData.phoneNumber);
-          
-  //         return {
-  //           ...documentData,
-  //           userInfo: userDetails
-  //         };
-  //       });
-
-  //       const fetchedDocuments = await Promise.all(fetchedDocumentsPromises);
-        
-  //       // Sort documents by uploadDate in descending order
-  //       const sortedDocuments = fetchedDocuments.sort((a, b) => 
-  //         b.uploadDate.toDate() - a.uploadDate.toDate()
-  //       );
-  
-  //       console.log("fetchdoc", sortedDocuments);
-        
-  //       setDocuments(sortedDocuments);
-  //       setSortedDocuments(sortedDocuments);
-  //       setFilteredDocuments(sortedDocuments);
-  //       setIsLoading(false);
-  //     }, (error) => {
-  //       console.error("Error fetching documents:", error);
-  //       setError("Failed to load documents. Please try again later.");
-  //       setIsLoading(false);
-  //     });
-  
-  //     return () => unsubscribe();
-  //   };
-  
-  //   fetchDocuments();
-  // }, []);
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].data();
+        return userData;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      return null;
+    }
+  };
 
   // useEffect(() => {
   //   const fetchDocuments = () => {
   //     setIsLoading(true);
-  //     const q = query(
-  //       collection(db, 'documents')
-  //       // Remove the 'where' clause to fetch all documents
-  //     );
-  
-  //     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-  //       console.log('Raw snapshot size:', querySnapshot.size);
-  //       console.log('Raw snapshot docs:', querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        
-  //       const fetchedDocumentsPromises = querySnapshot.docs.map(async doc => {
-  //         const documentData = {
-  //           id: doc.id,
-  //           ...doc.data()
-  //         };
-          
-  //         // Fetch user details for each document
-  //         let userDetails = null;
-  //         if (documentData.phoneNumber) {
-  //           userDetails = await fetchAuthorizedUserDetails(documentData.phoneNumber);
-  //           console.log('User details for document:', documentData.id, userDetails);
-  //         } else {
-  //           console.log('No phone number for document:', documentData.id);
-  //         }
-          
-  //         return {
-  //           ...documentData,
-  //           userInfo: userDetails
-  //         };
-  //       });
-  
-  //       const fetchedDocuments = await Promise.all(fetchedDocumentsPromises);
-        
-  //       // Sort documents by uploadDate in descending order, if uploadDate exists
-  //       const sortedDocuments = fetchedDocuments.sort((a, b) => {
-  //         if (a.uploadDate && b.uploadDate) {
-  //           return b.uploadDate.toDate() - a.uploadDate.toDate();
-  //         }
-  //         return 0; // If uploadDate doesn't exist, don't change order
-  //       });
-  
-  //       console.log("Processed documents:", sortedDocuments);
-        
-  //       setDocuments(sortedDocuments);
-  //       setSortedDocuments(sortedDocuments);
-  //       setFilteredDocuments(sortedDocuments);
-  //       setIsLoading(false);
-  //     }, (error) => {
-  //       console.error("Error fetching documents:", error);
-  //       setError("Failed to load documents. Please try again later.");
-  //       setIsLoading(false);
-  //     });
-  
-  //     return () => unsubscribe();
-  //   };
-  
-  //   fetchDocuments();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchDocuments = () => {
-  //     setIsLoading(true);
+  //     const docType = activeTab === "Agreement" ? "Agreement for sale" : "Demand letters";
+      
   //     const q = query(
   //       collection(db, 'documents'),
-  //       where('documentType', '==', 'Agreement for sale')
+  //       where('documentType', '==', docType)
   //     );
-  
-  //     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-  //       // console.log('Raw snapshot size:', querySnapshot.size);
-  //       // console.log('Raw snapshot docs:', querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        
-  //       const fetchedDocumentsPromises = querySnapshot.docs.map(async doc => {
-  //         const documentData = {
-  //           id: doc.id,
-  //           ...doc.data()
-  //         };
-          
-  //         // Fetch user details for each document
-  //         let userDetails = null;
-  //         if (documentData.phoneNumber) {
-  //           userDetails = await fetchAuthorizedUserDetails(documentData.phoneNumber);
-  //           // console.log('User details for document:', documentData.id, userDetails);
-  //         } else {
-  //           console.log('No phone number for document:', documentData.id);
-  //         }
-          
-  //         return {
-  //           ...documentData,
-  //           userInfo: userDetails
-  //         };
-  //       });
-  
-  //       const fetchedDocuments = await Promise.all(fetchedDocumentsPromises);
-        
-  //       // Sort documents by uploadDate in descending order, if uploadDate exists
-  //       const sortedDocuments = fetchedDocuments.sort((a, b) => {
-  //         if (a.uploadDate && b.uploadDate) {
-  //           return b.uploadDate.toDate() - a.uploadDate.toDate();
-  //         }
-  //         return 0; // If uploadDate doesn't exist, don't change order
-  //       });
-  
-  //       // console.log("Processed documents:", sortedDocuments);
-        
-  //       setDocuments(sortedDocuments);
-  //       setSortedDocuments(sortedDocuments);
-  //       setFilteredDocuments(sortedDocuments);
-  //       setIsLoading(false);
-  //     }, (error) => {
-  //       // console.error("Error fetching documents:", error);
-  //       setError("Failed to load documents. Please try again later.");
-  //       setIsLoading(false);
-  //     });
-  
-  //     return () => unsubscribe();
-  //   };
-  
-  //   fetchDocuments();
-  // }, []);
 
-  // useEffect(() => {
-  //   const fetchDocuments = () => {
-  //     setIsLoading(true);
-  //     const q = query(
-  //       collection(db, 'documents'),
-  //       where('documentType', '==', 'Agreement for sale')
-  //     );
-  
   //     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
   //       const fetchedDocumentsPromises = querySnapshot.docs.map(async doc => {
-  //         const documentData = {
-  //           id: doc.id,
-  //           ...doc.data()
-  //         };
-          
+  //         const documentData = { id: doc.id, ...doc.data() };
   //         let userDetails = null;
   //         if (documentData.phoneNumber) {
   //           userDetails = await fetchAuthorizedUserDetails(documentData.phoneNumber);
-  //         } else {
-  //           console.log('No phone number for document:', documentData.id);
   //         }
-          
-  //         return {
-  //           ...documentData,
-  //           userInfo: userDetails
-  //         };
+  //         return { ...documentData, userInfo: userDetails };
   //       });
-  
+
   //       const fetchedDocuments = await Promise.all(fetchedDocumentsPromises);
-        
-  //       // Sort documents by uploadDate in descending order, if uploadDate exists
-  //       const sortedDocuments = fetchedDocuments.sort((a, b) => {
+  //       const sortedDocs = fetchedDocuments.sort((a, b) => {
   //         if (a.uploadDate && b.uploadDate) {
   //           return dateSortDirection === 'asc' 
   //             ? a.uploadDate.toDate() - b.uploadDate.toDate()
   //             : b.uploadDate.toDate() - a.uploadDate.toDate();
   //         }
-  //         return 0; // If uploadDate doesn't exist, don't change order
+  //         return 0;
   //       });
-        
-  //       setDocuments(sortedDocuments);
-  //       setSortedDocuments(sortedDocuments);
-  //       setFilteredDocuments(sortedDocuments);
+
+  //       setDocuments(sortedDocs);
+  //       setSortedDocuments(sortedDocs);
+  //       setFilteredDocuments(sortedDocs);
   //       setIsLoading(false);
   //     }, (error) => {
   //       console.error("Error fetching documents:", error);
   //       setError("Failed to load documents. Please try again later.");
   //       setIsLoading(false);
   //     });
-  
+
   //     return () => unsubscribe();
   //   };
-  
+
   //   fetchDocuments();
-  // }, [dateSortDirection]); // Add dateSortDirection as a dependency
-  
+  // }, [activeTab, dateSortDirection]);
+
   useEffect(() => {
     const fetchDocuments = () => {
       setIsLoading(true);
@@ -413,9 +215,12 @@ const DocumentTable = ({ onTabChange }) => {
         const fetchedDocumentsPromises = querySnapshot.docs.map(async doc => {
           const documentData = { id: doc.id, ...doc.data() };
           let userDetails = null;
+          
+          // Fetch user details using phoneNumber
           if (documentData.phoneNumber) {
-            userDetails = await fetchAuthorizedUserDetails(documentData.phoneNumber);
+            userDetails = await fetchUserDetails(documentData.phoneNumber);
           }
+          
           return { ...documentData, userInfo: userDetails };
         });
 
@@ -489,6 +294,8 @@ const DocumentTable = ({ onTabChange }) => {
   };
 
 
+
+
   useEffect(() => {
     filterDocuments(searchTerm, selectedStatus, sortedDocuments);
   }, [sortedDocuments, searchTerm, selectedStatus]);
@@ -518,6 +325,29 @@ const DocumentTable = ({ onTabChange }) => {
   const currentItems = filteredDocuments.slice(indexOfFirstItem, indexOfLastItem);
   const isAllSelected = currentItems.length > 0 && selectedRows.length === currentItems.length;
 
+  const getFlatDisplay = (document) => {
+    const userInfo = document.userInfo;
+    const documentFlatId = document.flatId;
+    
+    if (!userInfo || !userInfo.flats || !userInfo.flats.approved) return 'N/A';
+    
+    // Find the flat that matches the documentFlatId
+    const matchingFlat = userInfo.flats.approved.find(flat => flat.flatId === documentFlatId);
+    
+    if (matchingFlat) {
+      return `${matchingFlat.wing || ''} - ${matchingFlat.flatNumber || ''}`;
+    }
+    
+    // Fallback to first approved flat if no match found
+    const approvedFlats = userInfo.flats.approved;
+    if (approvedFlats.length > 0) {
+      const flat = approvedFlats[0];
+      return `${flat.wing || ''} - ${flat.flatNumber || ''}`;
+    }
+    
+    return 'N/A';
+  };
+  
   const handleSort = (startDate, endDate) => {
     let filtered;
     if (!startDate && !endDate) {
@@ -774,11 +604,11 @@ const handleDateSort = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleEditClick = (document, index) => {
-    setEditingDocument({ ...document });
-    setEditingIndex(index);
-    setIsEditModalOpen(true);
-  };
+  // const handleEditClick = (document, index) => {
+  //   setEditingDocument({ ...document });
+  //   setEditingIndex(index);
+  //   setIsEditModalOpen(true);
+  // };
 
   const truncateText = (text, charLimit = 20) => {
     if (text.length <= charLimit) {
@@ -803,8 +633,14 @@ const handleDateSort = () => {
 
   const handleCloseModal = () => {
     setIsEditModalOpen(false);
-    setEditingDocument(null);
-    setEditingIndex(null);
+    setDocumentToEdit(null);
+  };
+  const handleEditClick = (document) => {
+    setDocumentToEdit({
+      ...document,
+      userId: document.userInfo?.id // Make sure we pass the userId for the modal
+    });
+    setIsEditModalOpen(true);
   };
 
   const handleStatusSelect = (status) => {
@@ -938,7 +774,7 @@ const handleDateSort = () => {
                 </svg>
               </button>
             )}
-            <button onClick={() => handleEditClick(doc, actualIndex)}>
+            <button onClick={() => handleEditClick(doc)}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.7586 5.73201L14.268 2.24061C14.1519 2.1245 14.0141 2.0324 13.8624 1.96957C13.7107 1.90673 13.5482 1.87439 13.384 1.87439C13.2198 1.87439 13.0572 1.90673 12.9056 1.96957C12.7539 2.0324 12.6161 2.1245 12.5 2.24061L2.86641 11.875C2.74983 11.9906 2.65741 12.1283 2.59451 12.28C2.5316 12.4317 2.49948 12.5944 2.50001 12.7586V16.25C2.50001 16.5815 2.6317 16.8994 2.86612 17.1339C3.10054 17.3683 3.41849 17.5 3.75001 17.5H7.24141C7.40563 17.5005 7.5683 17.4684 7.71999 17.4055C7.87168 17.3426 8.00935 17.2502 8.12501 17.1336L17.7586 7.49998C17.8747 7.3839 17.9668 7.24609 18.0296 7.09442C18.0925 6.94274 18.1248 6.78017 18.1248 6.616C18.1248 6.45182 18.0925 6.28925 18.0296 6.13758C17.9668 5.9859 17.8747 5.84809 17.7586 5.73201ZM7.24141 16.25H3.75001V12.7586L10.625 5.88358L14.1164 9.37498L7.24141 16.25ZM15 8.49061L11.5086 4.99998L13.3836 3.12498L16.875 6.61561L15 8.49061Z" fill="#6B7280"/>
               </svg>
@@ -958,22 +794,7 @@ const handleDateSort = () => {
   
   const Status = ['Sort Status', 'Seen', 'Pending'];
 
-  const getFlatDisplay = (userInfo) => {
-    if (!userInfo) return 'N/A';
-    
-    // Check for flats.approved array first
-    if (userInfo.flats?.approved && Array.isArray(userInfo.flats.approved) && userInfo.flats.approved.length > 0) {
-      const flat = userInfo.flats.approved[0]; // Display first approved flat
-      return `${flat.wing || ''} - ${flat.flatNumber || ''}`;
-    }
-    
-    // Fallback to wing and flatNumber directly on userInfo
-    if (userInfo.wing && userInfo.flatNumber) {
-      return `${userInfo.wing} - ${userInfo.flatNumber}`;
-    }
-    
-    return 'N/A';
-  };
+  
   
   return (
     <div className="mt-1 bg-white border rounded-lg overflow-hidden flex flex-col h-full">
@@ -1242,11 +1063,17 @@ const handleDateSort = () => {
         </div>
       </div>
 
-      <EditingDocumentModal
+      {/* <EditingDocumentModal
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}
         document={editingDocument}
         onSave={handleSaveEdit}
+      /> */}
+      <AddEditDocumentsModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseModal}
+        documentToEdit={documentToEdit}
+        isEditMode={true}
       />
 
       <DeleteModal

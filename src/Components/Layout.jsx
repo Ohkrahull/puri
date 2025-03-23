@@ -15,6 +15,8 @@ import NotificationSidebar from './NotificationSidebar';
 import { toast } from 'react-toastify';
 import GlobalSearch from './GlobalSearch';
 import GlobalSearchDropdown from './GlobalSearch';
+import { useNotifications } from '../context/NotificationContext'; // Import notification context
+import NotificationBadge from './NotificationBadge';
 
 // Add new CSS style for dropdown animations
 const dropdownStyles = {
@@ -42,12 +44,14 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  console.log("User Data", user);
+  // console.log("User Data", user);
   
   const { isFormEditing, formDirty, setFormDirty,startSave , endSave, headerData } = useHeader();
  
   const [isSaving, setIsSaving] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  // Use notification context
+  const { unreadCount, toggleSidebar: toggleNotificationSidebar, isOpen: isNotificationSidebarOpen } = useNotifications();
+  // const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const isOnFlatNoForm = location.pathname === '/FlatNoForm';
   
   const isHelperProfile = location.pathname.includes('/Helperprofile/'); // Match your exact path
@@ -639,28 +643,21 @@ const renderUserProfileInSidebar = () => {
             {renderSearchOrSave()}
 
             <div className="flex items-center gap-2">
-              {/* <button className="p-2 hover:bg-gray-50 rounded-full">
-                <HelpCircle color='#4b5563' size={24}/>
+              
+{/* <button 
+                className="p-2 hover:bg-gray-50 rounded-full relative"
+                onClick={toggleNotificationSidebar}
+                aria-label="Notifications"
+              >
+                <Bell size={24} />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                )}
               </button> */}
 
-              <button 
-  className="p-2 hover:bg-gray-50 rounded-full relative"
-  onClick={() => setIsNotificationOpen(true)}
->
-  <Bell size={24} />
-  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-</button>
+<NotificationBadge key={`notification-badge-${Date.now()}`} />
 
-              {/* <div className="h-8 border-l border-gray-200 mx-8"></div> */}
 
-              
-              {/* <ProfileDropdown 
-    user={user} 
-    onLogout={() => {
-      logout();
-      navigate('/login');
-    }} 
-  /> */}
    {!isMobile && (
                 <>
                   <div className="h-8 border-l border-gray-200 mx-2 sm:mx-8"></div>
@@ -678,22 +675,7 @@ const renderUserProfileInSidebar = () => {
         </div>
       </header>
 
-      {/* Mobile Menu Button */}
-      {/* <button
-        onClick={toggleSidebar}
-        type="button"
-        className="fixed top-20 left-4 inline-flex items-center p-2 mt-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 z-50"
-      >
-        <span className="sr-only">Open sidebar</span>
-        <svg className="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-          <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" />
-        </svg>
-      </button> */}
-
-      {/* Sidebar */}
-      {/* <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] min-w-[220px] transition-transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } sm:translate-x-0 bg-white border-r border-gray-100`}> */}
+      
       <aside className={`${styles.customScrollbar} fixed top-[72px] left-0 z-40 h-[calc(100vh-72px)] min-w-[220px] transition-transform ${
   sidebarOpen ? 'translate-x-0' : '-translate-x-full'
 } ${isTabletOrMobile ? '' : 'translate-x-0'} bg-white border-r border-gray-100`}>
@@ -1085,10 +1067,11 @@ const renderUserProfileInSidebar = () => {
         </div>
       </aside>
 
-      <NotificationSidebar 
+      {/* <NotificationSidebar 
   isOpen={isNotificationOpen}
   onClose={() => setIsNotificationOpen(false)}
-/>
+/> */}
+ <NotificationSidebar />
 
       {/* Main Content */}
       {/* <main className={`pt-[72px] transition-all duration-300 ${sidebarOpen ? 'sm:ml-64' : 'sm:ml-64 ml-0'}`} >

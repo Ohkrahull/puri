@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { ConfirmationDialog } from './confirmationDialog';
 import RejectionModal from './RejectedModal';
+import { useAuth } from '../context/AuthContext';
 
 
 // Status Badge Component
@@ -13,6 +14,7 @@ const StatusBadge = ({ status, helper }) => {
     const [showRejectionModal, setShowRejectionModal] = useState(false);
     const [pendingStatus, setPendingStatus] = useState(null);
     const db = getFirestore(getApp());
+    const {user} = useAuth();
   
     // Helper function for generating unique ticket ID
     const generateTicketId = async () => {
@@ -126,6 +128,36 @@ const StatusBadge = ({ status, helper }) => {
       }
     };
   
+    // const handleStatusChange = async (newStatus) => {
+    //   try {
+    //     const helperRef = doc(db, "helpers", helper.id);
+    //     let updateData = { status: newStatus };
+  
+    //     // Handle ticketId based on status transition
+    //     if (newStatus === 'approved') {
+    //       if (status === 'pending' || !helper.ticketId) {
+    //         const ticketId = await generateTicketId();
+    //         updateData.ticketId = ticketId;
+    //       }
+    //     } else if (newStatus === 'pending' && status === 'approved') {
+    //       updateData.ticketId = '';
+    //     } else if (newStatus === 'rejected') {
+    //       updateData.ticketId = '';
+    //     }
+  
+    //     await updateDoc(helperRef, updateData);
+    //     toast.success(`Status updated to ${newStatus}`);
+        
+    //     if (updateData.ticketId) {
+    //       toast.success(`New ticket ID generated: ${updateData.ticketId}`);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error updating status:", error);
+    //     toast.error("Failed to update status");
+    //   }
+    //   setShowConfirmation(false);
+    // };
+  
     const handleStatusChange = async (newStatus) => {
       try {
         const helperRef = doc(db, "helpers", helper.id);
@@ -133,14 +165,26 @@ const StatusBadge = ({ status, helper }) => {
   
         // Handle ticketId based on status transition
         if (newStatus === 'approved') {
+          // Store current user's phone number when approving
+          if (user?.phoneNumber) {
+            updateData.phoneNumber = user.phoneNumber;
+          } else {
+            toast.warning('Your phone number is not available in your profile');
+          }
+          
+          // Generate ticket ID if needed
           if (status === 'pending' || !helper.ticketId) {
             const ticketId = await generateTicketId();
             updateData.ticketId = ticketId;
           }
         } else if (newStatus === 'pending' && status === 'approved') {
           updateData.ticketId = '';
+          // Optionally clear phoneNumber when moving from approved to pending
+          updateData.phoneNumber = '';
         } else if (newStatus === 'rejected') {
           updateData.ticketId = '';
+          // Optionally clear phoneNumber when rejecting
+          updateData.phoneNumber = '';
         }
   
         await updateDoc(helperRef, updateData);
@@ -155,7 +199,6 @@ const StatusBadge = ({ status, helper }) => {
       }
       setShowConfirmation(false);
     };
-  
     return (
       <>
         <div className="relative">
@@ -217,7 +260,7 @@ const StatusBadge = ({ status, helper }) => {
           onClose={() => setShowRejectionModal(false)}
           helper={helper}
           onConfirm={() => {
-            toast.success('Helper rejected successfully');
+            handleStatusChange('rejected');
             setShowRejectionModal(false);
           }}
         />
