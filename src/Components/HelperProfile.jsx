@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronLeft, X, Upload } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, query, where, deleteDoc } from 'firebase/firestore';
@@ -7,6 +7,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
 import { DownloadSimple } from 'phosphor-react';
 import { useHeader } from '../context/HeaderContext';
+import { useAuth } from '../context/AuthContext';
 
 const WING_DATA = [
   { label: 'A', value: 'A' },
@@ -43,14 +44,26 @@ const HelperProfile = () => {
   const storage = getStorage(getApp());
   const { setFormDirty, startSave, endSave, setIsFormEditing, headerData } = useHeader();
 const { setSelectedUser, setIsAddingNew } = headerData;
+const dropdownRef = useRef(null);
+const { user } = useAuth();
+  
 
   const [selectedWings, setSelectedWings] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
-  const [selectedWing, setSelectedWing] = useState('A');
+  // const [selectedWing, setSelectedWing] = useState('A');
   const [selectedFlat, setSelectedFlat] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [selectedFlats, setSelectedFlats] = useState([]);
+  const [availableWings, setAvailableWings] = useState([]);
+  const [availableFlats, setAvailableFlats] = useState({});
+  const [flatsData, setFlatsData] = useState([]);
+  const [selectedWing, setSelectedWing] = useState('');
+  const [selectedFlatNumber, setSelectedFlatNumber] = useState('');
+
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -68,6 +81,63 @@ const { setSelectedUser, setIsAddingNew } = headerData;
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [dropdownPosition, setDropdownPosition] = useState('bottom');
+
+
+   // Fetch flats data on component mount
+   useEffect(() => {
+    const fetchFlats = async () => {
+      try {
+        const flatsRef = collection(db, 'flats');
+        const querySnapshot = await getDocs(flatsRef);
+        
+        const flats = [];
+        const wings = new Set();
+        const flatsByWing = {};
+        
+        querySnapshot.forEach((doc) => {
+          const id = doc.id;
+          const parts = id.split('_');
+          
+          if (parts.length >= 3 && parts[0] === 'flat') {
+            const wing = parts[1]; // Get wing part (A, B, C, etc.)
+            const flatNumber = parts[2]; // Get flat number (101, 102, etc.)
+            
+            wings.add(wing);
+            
+            if (!flatsByWing[wing]) {
+              flatsByWing[wing] = [];
+            }
+            
+            flatsByWing[wing].push({
+              id: id,
+              flatNumber: flatNumber,
+              displayName: `${wing}-${flatNumber}`
+            });
+            
+            flats.push({
+              id: id,
+              wing: wing,
+              flatNumber: flatNumber,
+              displayName: `${wing}-${flatNumber}`
+            });
+          }
+        });
+        
+        setFlatsData(flats);
+        setAvailableWings(Array.from(wings).sort());
+        setAvailableFlats(flatsByWing);
+        
+        if (wings.size > 0) {
+          setSelectedWing(Array.from(wings)[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching flats:', error);
+        toast.error('Failed to load flats data');
+      }
+    };
+    
+    fetchFlats();
+  }, [db]);
 
    // Handle resize events to detect mobile view
    useEffect(() => {
@@ -97,7 +167,41 @@ const { setSelectedUser, setIsAddingNew } = headerData;
             documents: helperData.documents || [],
             employeeId: helperData.employeeId || ''
           });
-          setSelectedWings(helperData.flatNumbers || []);
+
+          // Process flat IDs and map to display values for UI
+          const flatIds = helperData.flatNumbers || [];
+          
+          // For each flatId, find the corresponding flat in flatsData or create a display object
+          const flatsToDisplay = flatIds.map(flatId => {
+            // Try to find the flat in our flats data
+            const foundFlat = flatsData.find(flat => flat.id === flatId);
+            
+            // If found, use that
+            if (foundFlat) {
+              return foundFlat;
+            } 
+            // Otherwise, try to parse the ID to create a display name
+            else {
+              const parts = flatId.split('_');
+              if (parts.length >= 3 && parts[0] === 'flat') {
+                const wing = parts[1];
+                const flatNumber = parts[2];
+                return {
+                  id: flatId,
+                  wing: wing,
+                  flatNumber: flatNumber,
+                  displayName: `${wing}-${flatNumber}`
+                };
+              }
+              // If all else fails, just show the ID
+              return {
+                id: flatId,
+                displayName: flatId
+              };
+            }
+          });
+          
+          setSelectedFlats(flatsToDisplay);
   
           // First try to fetch guard data using employeeId
           if (helperData.employeeId) {
@@ -141,7 +245,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
     if (id) {
       fetchData();
     }
-  }, [id, db]);
+  }, [id, db, flatsData]);
 
   const handleDeleteProfile = async () => {
     try {
@@ -254,22 +358,49 @@ const { setSelectedUser, setIsAddingNew } = headerData;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log('Input change:', name, value); // Add logging
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Special handling for phone number
+    if (name === 'phone') {
+      // Remove any existing +91 and non-digit characters
+      const cleanedPhone = value.replace(/\D/g, '');
+      
+      // Prepend +91 if not already present
+      const formattedPhone = cleanedPhone.startsWith('91') 
+        ? `+${cleanedPhone}` 
+        : `+91${cleanedPhone}`;
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedPhone
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+    
     setIsDirty(true);
     setFormDirty(true);
+  };
+
+  const formatPhoneForDisplay = (phone) => {
+    if (!phone) return '';
+    
+    // Remove +91 and format the remaining 10 digits
+    const cleanedPhone = phone.replace('+91', '');
+    return cleanedPhone.length === 10 
+      ? `${cleanedPhone.slice(0, 5)} ${cleanedPhone.slice(5)}` 
+      : cleanedPhone;
   };
   // const handleRemoveWing = (wingToRemove) => {
   //   setSelectedWings(prev => prev.filter(wing => wing !== wingToRemove));
   //   setIsDirty(true);
   // };
-  const handleRemoveWing = (wingToRemove) => {
-    setSelectedWings(prev => prev.filter(wing => wing !== wingToRemove));
+  const handleRemoveFlat = (flatToRemove) => {
+    setSelectedFlats(prev => prev.filter(flat => flat.id !== flatToRemove.id));
     setIsDirty(true);
-    setFormDirty(true); // Add this
+    setFormDirty(true);
   };
 
   // const handleUpdateProfile = async () => {
@@ -332,16 +463,17 @@ const { setSelectedUser, setIsAddingNew } = headerData;
   // };
 
   const handleAddFlat = () => {
-    if (selectedWing && selectedFlat) {
-      const flatString = `${selectedWing}-${selectedFlat}`;
-      if (!selectedWings.includes(flatString)) {
-        setSelectedWings(prev => [...prev, flatString]);
+    if (selectedWing && selectedFlatNumber) {
+      const selectedFlat = availableFlats[selectedWing]?.find(flat => flat.flatNumber === selectedFlatNumber);
+      
+      if (selectedFlat && !selectedFlats.some(flat => flat.id === selectedFlat.id)) {
+        setSelectedFlats(prev => [...prev, selectedFlat]);
         setIsDirty(true);
-        setFormDirty(true); // Add this
+        setFormDirty(true);
       }
+      
       setIsModalOpen(false);
-      setSelectedWing('A');
-      setSelectedFlat('');
+      setSelectedFlatNumber('');
     }
   };
 
@@ -362,7 +494,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
           visitorPhoneNumber: formData.phone, // Make sure we're using the current phone value
           documentType: formData.documentType,
           services: [{ name: formData.service, status: 'active' }],
-          flatNumbers: selectedWings,
+          flatNumbers: selectedFlats.map(flat => flat.id),
           updatedAt: new Date()
         };
   
@@ -556,64 +688,64 @@ const { setSelectedUser, setIsAddingNew } = headerData;
                 <input
                   type="tel"
                   name="phone"
-                  value={formData.phone}
+                  value={formatPhoneForDisplay(formData.phone)}
                   style={{fontSize:16}}
                   onChange={handleInputChange}
+                  maxLength={10} // Limit to 10 digits for display
                   className="w-full px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-[#4B5563] text-base outline-none"
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
-                <div className="flex flex-wrap md:flex-nowrap gap-2">
-                  <button 
-                  type="button" // Add this
+              <div className="space-y-1.5" ref={dropdownRef}>
+              <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
+              <div className="flex gap-2 flex-wrap md:flex-nowrap">
+                <button 
+                  type="button"
                   onClick={(e) => {
-                    e.preventDefault(); // Add this
-                    setIsModalOpen(true)
+                    e.preventDefault();
+                    setIsModalOpen(true);
                   }}
-                    // onClick={() => setIsModalOpen(true)}
-                    style={{fontSize:16}}
-                    className="px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center gap-2 text-[#4B5563] min-w-[100px]"
-                  >
-                    Wing <ChevronDown size={16} />
-                  </button>
-                  <input
-                    type="text"
-                    placeholder="Flat number"
-                    readOnly
-                    onClick={() => setIsModalOpen(true)}
-                    style={{fontSize:16}}
-                    className="flex-1 px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-[#4B5563] text-base outline-none cursor-pointer"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2 items-center">
-                  {selectedWings.map((wing) => (
-                    <div
-                      key={wing}
-                      style={{borderRadius:20, border:'1px solid #E5E5E5'}}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-[#F9FAFB] rounded text-sm border border-[#E5E7EB]"
-                    >
-                      {wing}
-                      <X 
-                        size={14} 
-                        className="text-gray-400 cursor-pointer ml-1" 
-                        onClick={() => handleRemoveWing(wing)}
-                      />
-                    </div>
-                  ))}
-                  <button 
-                  type="button" // Add this
-                  onClick={(e) => {
-                    e.preventDefault(); // Add this
-                    setIsModalOpen(true)
-                  }}
-                    // onClick={() => setIsModalOpen(true)}
-                    className="text-blue-500 text-end text-sm hover:text-blue-600"
-                  >
-                    Add More
-                  </button>
-                </div>
+                  style={{fontSize:16}}
+                  className="px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center gap-2 text-[#4B5563] min-w-[100px]"
+                >
+                  Wing <ChevronDown size={16} />
+                </button>
+                <input
+                  type="text"
+                  placeholder="Flat number"
+                  readOnly
+                  onClick={() => setIsModalOpen(true)}
+                  style={{fontSize:16}}
+                  className="flex-1 px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-[#4B5563] text-base outline-none cursor-pointer"
+                />
               </div>
+              <div className="flex flex-wrap gap-2 mt-2 items-center">
+                {selectedFlats.map((flat) => (
+                  <div
+                    key={flat.id}
+                    style={{borderRadius:20, border:'1px solid #E5E5E5'}}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#F9FAFB] rounded text-sm border border-[#E5E7EB]"
+                  >
+                    {/* Show the user-friendly display name */}
+                    {flat.displayName}
+                    <X 
+                      size={14} 
+                      className="text-gray-400 cursor-pointer ml-1" 
+                      onClick={() => handleRemoveFlat(flat)}
+                    />
+                  </div>
+                ))}
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsModalOpen(true);
+                  }}
+                  className="text-blue-500 text-end text-sm hover:text-blue-600"
+                >
+                  Add More
+                </button>
+              </div>
+            </div>
             {/* </div> */}
 
             {/* Document Type and Service */}
@@ -851,13 +983,16 @@ const { setSelectedUser, setIsAddingNew } = headerData;
                 <div className="relative">
                   <select 
                     value={selectedWing}
-                    onChange={(e) => setSelectedWing(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedWing(e.target.value);
+                      setSelectedFlatNumber('');
+                    }}
                     className="w-full px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg text-[#4B5563] appearance-none"
                   >
                     <option value="" disabled>Wing</option>
-                    {WING_DATA.map((wing) => (
-                      <option key={wing.value} value={wing.value}>
-                        {wing.label}
+                    {availableWings.map((wing) => (
+                      <option key={wing} value={wing}>
+                        {wing}
                       </option>
                     ))}
                   </select>
@@ -865,33 +1000,34 @@ const { setSelectedUser, setIsAddingNew } = headerData;
 
                 <div className="relative">
                   <select
-                    value={selectedFlat}
-                    onChange={(e) => setSelectedFlat(e.target.value)}
+                    value={selectedFlatNumber}
+                    onChange={(e) => setSelectedFlatNumber(e.target.value)}
                     className="w-full px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg text-[#4B5563] appearance-none"
                   >
                     <option value="" disabled>Flat No.</option>
-                    {selectedWing && FLAT_DATA[selectedWing].map((flat) => (
-                      <option key={flat} value={flat}>
-                        {flat}
+                    {selectedWing && availableFlats[selectedWing]?.map((flat) => (
+                      <option key={flat.id} value={flat.flatNumber}>
+                        {flat.flatNumber}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {selectedWings.length > 0 && (
+              {selectedFlats.length > 0 && (
                 <div className="mt-4 p-4 bg-[#F9FAFB] rounded-lg">
                   <div className="flex flex-wrap gap-2">
-                    {selectedWings.map((wing) => (
+                    {selectedFlats.map((flat) => (
                       <div
-                        key={wing}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-white rounded text-sm border border-[#E5E7EB]"
+                        key={flat.id}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full text-sm border border-[#E5E7EB]"
                       >
-                        {wing}
+                        {/* Display the wing-flat name but we'll store the full ID */}
+                        {flat.displayName}
                         <X 
                           size={14} 
                           className="text-gray-400 cursor-pointer ml-1" 
-                          onClick={() => handleRemoveWing(wing)}
+                          onClick={() => handleRemoveFlat(flat)}
                         />
                       </div>
                     ))}
@@ -901,7 +1037,7 @@ const { setSelectedUser, setIsAddingNew } = headerData;
 
               <button
                 onClick={handleAddFlat}
-                disabled={!selectedWing || !selectedFlat}
+                disabled={!selectedWing || !selectedFlatNumber}
                 className="w-full mt-6 py-4 bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue

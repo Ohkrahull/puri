@@ -73,13 +73,20 @@ const AddHelperForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
   const [showServiceDropdown, setShowServiceDropdown] = useState(false);
-  const [selectedWing, setSelectedWing] = useState('A');
-  const [selectedFlat, setSelectedFlat] = useState('');
+  // const [selectedWing, setSelectedWing] = useState('A');
+  const [selectedFlats, setSelectedFlats] = useState([]);
   const [dropdownPosition, setDropdownPosition] = useState('bottom');
   const [isUploading, setIsUploading] = useState(false);
   const [documentFile, setDocumentFile] = useState(null);
   const [isDocumentUploading, setIsDocumentUploading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // New state for available flats from Firestore
+  const [availableWings, setAvailableWings] = useState([]);
+  const [availableFlats, setAvailableFlats] = useState({});
+  const [flatsData, setFlatsData] = useState([]);
+  const [selectedWing, setSelectedWing] = useState('');
+  const [selectedFlatNumber, setSelectedFlatNumber] = useState('');
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -90,6 +97,63 @@ const AddHelperForm = () => {
     imageUrl: '',
     documents: []
   });
+
+   // Fetch flats data on component mount
+   useEffect(() => {
+    const fetchFlats = async () => {
+      try {
+        const flatsRef = collection(db, 'flats');
+        const querySnapshot = await getDocs(flatsRef);
+        
+        const flats = [];
+        const wings = new Set();
+        const flatsByWing = {};
+        
+        querySnapshot.forEach((doc) => {
+          const id = doc.id;
+          const parts = id.split('_');
+          
+          if (parts.length >= 3 && parts[0] === 'flat') {
+            const wing = parts[1]; // Get wing part (A, B, C, etc.)
+            const flatNumber = parts[2]; // Get flat number (101, 102, etc.)
+            
+            wings.add(wing);
+            
+            if (!flatsByWing[wing]) {
+              flatsByWing[wing] = [];
+            }
+            
+            flatsByWing[wing].push({
+              id: id,
+              flatNumber: flatNumber,
+              displayName: `${wing}-${flatNumber}`
+            });
+            
+            flats.push({
+              id: id,
+              wing: wing,
+              flatNumber: flatNumber,
+              displayName: `${wing}-${flatNumber}`
+            });
+          }
+        });
+        
+        setFlatsData(flats);
+        setAvailableWings(Array.from(wings).sort());
+        setAvailableFlats(flatsByWing);
+        
+        if (wings.size > 0) {
+          setSelectedWing(Array.from(wings)[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching flats:', error);
+        toast.error('Failed to load flats data');
+      }
+    };
+    
+    fetchFlats();
+  }, [db]);
+
 
   // Add resize listener for mobile detection
   useEffect(() => {
@@ -181,26 +245,56 @@ const handleDocumentUpload = async (file) => {
   }
 };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  
+  // Special handling for phone number
+  if (name === 'phone') {
+    // Remove any non-digit characters and limit to 10 digits
+    const cleanedPhone = value.replace(/\D/g, '').slice(0, 10);
+    
+    // Prepend +91 if not already present
+    const formattedPhone = `+91${cleanedPhone}`;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedPhone
+    }));
+  } else {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
 
-  const handleRemoveWing = (wingToRemove) => {
-    setSelectedWings(prev => prev.filter(wing => wing !== wingToRemove));
+const formatPhoneForDisplay = (phone) => {
+  if (!phone) return '';
+  
+  // Remove +91 and truncate to 10 digits
+  const cleanedPhone = phone.replace('+91', '').slice(0, 10);
+  return cleanedPhone.length === 10 
+    ? `${cleanedPhone.slice(0, 5)} ${cleanedPhone.slice(5)}` 
+    : cleanedPhone;
+};
+
+   const handleRemoveFlat = (flatToRemove) => {
+    setSelectedFlats(prev => prev.filter(flat => flat.id !== flatToRemove.id));
   };
 
   const handleAddFlat = () => {
-    if (selectedWing && selectedFlat) {
-      const flatString = `${selectedWing}-${selectedFlat}`;
-      if (!selectedWings.includes(flatString)) {
-        setSelectedWings(prev => [...prev, flatString]);
+    if (selectedWing && selectedFlatNumber) {
+      const selectedFlat = availableFlats[selectedWing]?.find(flat => flat.flatNumber === selectedFlatNumber);
+      
+      if (selectedFlat && !selectedFlats.some(flat => flat.id === selectedFlat.id)) {
+        setSelectedFlats(prev => [...prev, selectedFlat]);
       }
+      
       setIsModalOpen(false);
-      setSelectedWing('A');
-      setSelectedFlat('');
+      setSelectedFlatNumber('');
     }
   };
+
 
   const handleCreateHelper = async () => {
     try {
@@ -210,7 +304,7 @@ const handleDocumentUpload = async (file) => {
         return;
       }
 
-      if (selectedWings.length === 0) {
+      if (selectedFlats.length === 0) {
         toast.error('Please add at least one flat');
         return;
       }
@@ -231,7 +325,7 @@ const handleDocumentUpload = async (file) => {
         documentType: formData.documentType,
         documents: formData.documents,
         services: [{ name: formData.service, status: 'active' }],
-        flatNumbers: selectedWings,
+        flatNumbers: selectedFlats.map(flat => flat.id), // Store flat IDs directly in flatNumbers
         createdAt: new Date(),
         status: 'approved',
         current:"",
@@ -364,13 +458,14 @@ const handleDocumentUpload = async (file) => {
                 <input
                   type="tel"
                   name="phone"
-                  value={formData.phone}
+                  value={formatPhoneForDisplay(formData.phone)}
                   onChange={handleInputChange}
+                  maxLength={10} // Limit input to 10 digits in UI
                   className="w-full px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-[#4B5563] text-base outline-none"
                   style={{fontSize: 16}}
                 />
               </div>
-              <div className="space-y-1.5">
+              {/* <div className="space-y-1.5">
                 <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
                 <div className="flex gap-2 flex-wrap md:flex-nowrap">
                   <button 
@@ -410,7 +505,51 @@ const handleDocumentUpload = async (file) => {
                     Add More
                   </button>
                 </div>
+              </div> */}
+               <div className="space-y-1.5">
+              <label className="text-[12px] text-[#6B7280] block">Flat no.</label>
+              <div className="flex gap-2 flex-wrap md:flex-nowrap">
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  className="px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg flex items-center gap-2 text-[#4B5563] min-w-[100px]"
+                  style={{fontSize: 16}}
+                >
+                  Wing <ChevronDown size={16} />
+                </button>
+                <input
+                  type="text"
+                  placeholder="Flat number"
+                  readOnly
+                  onClick={() => setIsModalOpen(true)}
+                  className="flex-1 px-4 h-[45px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-[#4B5563] text-base outline-none cursor-pointer"
+                  style={{fontSize: 16}}
+                />
               </div>
+              <div className="flex flex-wrap gap-2 mt-2 items-center">
+                {selectedFlats.map((flat) => (
+                  <div
+                    key={flat.id}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#F9FAFB] rounded-full text-sm border border-[#E5E7EB]"
+                  >
+                    {/* Show the wing-flat display name for UI, but we'll store the ID */}
+                    {flat.displayName}
+                    <X 
+                      size={14} 
+                      className="text-gray-400 cursor-pointer ml-1" 
+                      onClick={() => handleRemoveFlat(flat)}
+                    />
+                  </div>
+                ))}
+                {selectedFlats.length > 0 && (
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="text-blue-500 text-sm hover:text-blue-600"
+                  >
+                    Add More
+                  </button>
+                )}
+              </div>
+            </div>
             {/* </div> */}
 
             {/* Document Type and Service */}
@@ -574,13 +713,16 @@ const handleDocumentUpload = async (file) => {
                 <div className="relative">
                   <select 
                     value={selectedWing}
-                    onChange={(e) => setSelectedWing(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedWing(e.target.value);
+                      setSelectedFlatNumber('');
+                    }}
                     className="w-full px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg text-[#4B5563] appearance-none"
                   >
                     <option value="" disabled>Wing</option>
-                    {WING_DATA.map((wing) => (
-                      <option key={wing.value} value={wing.value}>
-                        {wing.label}
+                    {availableWings.map((wing) => (
+                      <option key={wing} value={wing}>
+                        {wing}
                       </option>
                     ))}
                   </select>
@@ -588,33 +730,34 @@ const handleDocumentUpload = async (file) => {
 
                 <div className="relative">
                   <select
-                    value={selectedFlat}
-                    onChange={(e) => setSelectedFlat(e.target.value)}
+                    value={selectedFlatNumber}
+                    onChange={(e) => setSelectedFlatNumber(e.target.value)}
                     className="w-full px-4 py-3 bg-white border border-[#E5E7EB] rounded-lg text-[#4B5563] appearance-none"
                   >
                     <option value="" disabled>Flat No.</option>
-                    {selectedWing && FLAT_DATA[selectedWing].map((flat) => (
-                      <option key={flat} value={flat}>
-                        {flat}
+                    {selectedWing && availableFlats[selectedWing]?.map((flat) => (
+                      <option key={flat.id} value={flat.flatNumber}>
+                        {flat.flatNumber}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {selectedWings.length > 0 && (
+              {selectedFlats.length > 0 && (
                 <div className="mt-4 p-4 bg-[#F9FAFB] rounded-lg">
                   <div className="flex flex-wrap gap-2">
-                    {selectedWings.map((wing) => (
+                    {selectedFlats.map((flat) => (
                       <div
-                        key={wing}
+                        key={flat.id}
                         className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full text-sm border border-[#E5E7EB]"
                       >
-                        {wing}
+                        {/* Display the wing-flat name but we'll store the full ID */}
+                        {flat.displayName}
                         <X 
                           size={14} 
                           className="text-gray-400 cursor-pointer ml-1" 
-                          onClick={() => handleRemoveWing(wing)}
+                          onClick={() => handleRemoveFlat(flat)}
                         />
                       </div>
                     ))}
@@ -624,7 +767,7 @@ const handleDocumentUpload = async (file) => {
 
               <button
                 onClick={handleAddFlat}
-                disabled={!selectedWing || !selectedFlat}
+                disabled={!selectedWing || !selectedFlatNumber}
                 className="w-full mt-6 py-4 bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue

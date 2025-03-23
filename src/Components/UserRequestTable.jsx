@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, query, onSnapshot, getFirestore, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, getFirestore, orderBy, deleteDoc, doc, updateDoc, getDoc, getDocs, where, arrayUnion } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import SortButton from '../Buttons/Sortdate';
 import DeleteModal from '../Modals/DeleteModal';
 import { useNavigate } from 'react-router-dom';
+
 
 const SearchInput = ({ requests, onSearch, userDetails }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -175,12 +176,215 @@ const FlatRequestsTable = () => {
   }, [searchTerm, dateSortDirection, userDetails]);
 
 
-  const handleStatusChange = async (requestId, newStatus) => {
+  // const handleStatusChange = async (requestId, newStatus) => {
+  //   try {
+  //     await updateDoc(doc(db, "flatRequests", requestId), {
+  //       status: newStatus
+  //     });
+  //     toast.success("Status updated successfully");
+  //   } catch (error) {
+  //     console.error("Error updating status:", error);
+  //     toast.error("Failed to update status");
+  //   }
+  // };
+  // const handleStatusChange = async (requestId, newStatus, phoneNumber) => {
+  //   try {
+  //     // First update the status in Firestore
+  //     await updateDoc(doc(db, "flatRequests", requestId), {
+  //       status: newStatus
+  //     });
+      
+  //     // If status is changed to Approved, send notification to the user
+  //     if (newStatus === 'Approved') {
+  //       // Send notification to the user
+  //       const notificationData = {
+  //         phoneNumber: phoneNumber,
+  //         title: "Flat Request Approved",
+  //         body: "Your flat request has been approved. Welcome to the community!",
+  //         additionalData: {
+  //           type: "flat_request", 
+  //           requestId: requestId,
+  //           status: "approved"
+  //         }
+  //       };
+        
+  //       try {
+  //         // Call the server API to send notification
+  //         const response = await fetch('http://localhost:5000/api/send-user-notification', {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify(notificationData),
+  //         });
+          
+  //         const result = await response.json();
+  //         if (result.error) {
+  //           console.error("Notification error:", result.error);
+  //         } else {
+  //           console.log("Notification sent successfully");
+  //         }
+  //       } catch (notificationError) {
+  //         console.error("Error sending notification:", notificationError);
+  //         // Don't throw here, as we've already updated the status
+  //       }
+  //     }
+      
+  //     toast.success("Status updated successfully");
+  //   } catch (error) {
+  //     console.error("Error updating status:", error);
+  //     toast.error("Failed to update status");
+  //   }
+  // };
+  const handleStatusChange = async (requestId, newStatus, phoneNumber, flatDetails) => {
     try {
-      await updateDoc(doc(db, "flatRequests", requestId), {
+      // Get the full request details
+      const requestRef = doc(db, 'flatRequests', requestId);
+      const requestSnap = await getDoc(requestRef);
+      
+      if (!requestSnap.exists()) {
+        toast.error("Request not found");
+        return;
+      }
+      
+      const requestData = requestSnap.data();
+      
+      // Find the user document
+      const userQuery = query(
+        collection(db, 'users'),
+        where('phoneNumber', '==', phoneNumber)
+      );
+      const userSnap = await getDocs(userQuery);
+  
+      if (userSnap.empty) {
+        toast.error('User not found');
+        return;
+      }
+  
+      const userDoc = userSnap.docs[0];
+      const userData = userDoc.data();
+      const userRef = doc(db, 'users', userDoc.id);
+  
+      // Prepare the flat request details
+      const flatRequestDetails = {
+        flatId: requestData.flatId,
+        flatNumber: flatDetails.flatNumber,
+        wing: flatDetails.wing
+      };
+  
+      if (newStatus === 'Approved') {
+        // 1. Update user's flats document
+        // Ensure flats and its sub-fields exist
+        const currentFlats = userData.flats || {};
+        const currentPending = currentFlats.pending || [];
+        const currentApproved = currentFlats.approved || [];
+  
+        // Remove the specific flat from pending
+        const updatedPending = currentPending.filter(
+          flat => flat.flatId !== flatRequestDetails.flatId
+        );
+  
+        // Add the flat to approved
+        const updatedApproved = [...currentApproved, flatRequestDetails];
+  
+        // Update the entire flats structure in users
+        await updateDoc(userRef, {
+          flats: {
+            ...currentFlats,
+            pending: updatedPending,
+            approved: updatedApproved
+          }
+        });
+        
+        // If documents exist, add them to the user's document
+        if (requestData.documents) {
+          await updateDoc(userRef, {
+            documents: requestData.documents
+          });
+        }
+  
+        // 2. Update the flats document to add this user
+        const flatRef = doc(db, 'flats', requestData.flatId);
+        
+        // Determine isResiding based on residenceType (assuming owners are residing unless specified)
+        const isResiding = requestData.residenceType === 'tenant' ? false : true;
+        
+        // Create the new user entry for the flat
+        const newUserEntry = {
+          userId: phoneNumber,
+          role: requestData.residenceType || 'owner', // Use residenceType as role
+          isResiding: isResiding
+        };
+        
+        // Add the user to the flat's users array
+        await updateDoc(flatRef, {
+          users: arrayUnion(newUserEntry),
+          updatedAt: new Date()
+        });
+      } else if (newStatus === 'Rejected') {
+        // For rejection, we just update the status in flatRequests
+        // You could potentially also update the user's pending list
+      } else if (newStatus === 'Pending') {
+        // Handle reverting to pending state if needed
+      }
+      
+      // 3. Always update the flat request status
+      await updateDoc(requestRef, {
         status: newStatus
       });
-      toast.success("Status updated successfully");
+      
+      // 4. Send notifications
+      if (newStatus === 'Approved' || newStatus === 'Rejected') {
+        // Prepare notification data based on status
+        const title = newStatus === 'Approved' 
+          ? "Flat Request Approved" 
+          : "Flat Request Status Update";
+          
+        const body = newStatus === 'Approved'
+          ? `Your flat request for ${flatDetails.wing}-${flatDetails.flatNumber} has been approved. Welcome to the community!`
+          : `Your flat request for ${flatDetails.wing}-${flatDetails.flatNumber} has been rejected. Please contact support for more information.`;
+        
+        // Additional data for the notification
+        const additionalData = {
+          type: "flat_request", 
+          requestId: requestId,
+          status: newStatus.toLowerCase(),
+          wing: flatDetails.wing,
+          flatNumber: flatDetails.flatNumber
+        };
+        
+        try {
+          // Call the server API to send notification to the specific user
+          const response = await fetch('https://puri-dashboard-server.onrender.com/api/send-user-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              phoneNumber: phoneNumber,
+              title: title,
+              body: body,
+              additionalData: additionalData
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+          }
+          
+          const result = await response.json();
+          if (result.error) {
+            console.error("Notification error:", result.error);
+          } else {
+            console.log(`Notification sent successfully for ${newStatus} status`);
+          }
+        } catch (notificationError) {
+          console.error("Error sending notification:", notificationError);
+          // Don't throw here, as we've already updated the status
+        }
+      }
+      
+      toast.success(`Status updated to ${newStatus} successfully`);
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update status");
@@ -192,7 +396,94 @@ const FlatRequestsTable = () => {
     return phone.startsWith('+91') ? phone.slice(3) : phone;
   };
 
-  const StatusDropdown = ({ currentStatus, onStatusChange }) => {
+  // const StatusDropdown = ({ currentStatus, onStatusChange }) => {
+  //   const statuses = ['Pending', 'Approved', 'Rejected'];
+  //   const [isOpen, setIsOpen] = useState(false);
+  
+  //   const getStatusStyles = (status) => {
+  //     switch (status?.toLowerCase()) {
+  //       case 'approved':
+  //         return {
+  //           container: 'bg-green-50 text-green-700',
+  //           dot: 'bg-green-600',
+  //           text: 'text-green-700'
+  //         };
+  //       case 'pending':
+  //         return {
+  //           container: 'bg-yellow-50 text-yellow-700',
+  //           dot: 'bg-yellow-600',
+  //           text: 'text-yellow-700'
+  //         };
+  //       case 'rejected':
+  //         return {
+  //           container: 'bg-red-50 text-red-700',
+  //           dot: 'bg-red-600',
+  //           text: 'text-red-700'
+  //         };
+  //       default:
+  //         return {
+  //           container: 'bg-gray-50 text-gray-700',
+  //           dot: 'bg-gray-600',
+  //           text: 'text-gray-700'
+  //         };
+  //     }
+  //   };
+  
+  //   const styles = getStatusStyles(currentStatus);
+  
+  //   const handleStatusClick = (e) => {
+  //     e.stopPropagation(); // Stop event from bubbling up
+  //     setIsOpen(!isOpen);
+  //   };
+  
+  //   const handleStatusChange = (e, newStatus) => {
+  //     e.stopPropagation(); // Stop event from bubbling up
+  //     onStatusChange(newStatus);
+  //     setIsOpen(false);
+  //   };
+  
+  //   return (
+  //     <div className="relative status-dropdown" onClick={(e) => e.stopPropagation()}>
+  //       <div
+  //         onClick={handleStatusClick}
+  //         className={`inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full ${styles.container}`}
+  //         style={{ fontSize: '12px' }}
+  //       >
+  //         <span className={`h-1.5 w-1.5 rounded-full ${styles.dot}`}></span>
+  //         <span className={`${styles.text} font-medium`}>{currentStatus || 'N/A'}</span>
+  //         <svg
+  //           className="w-4 h-4"
+  //           fill="none"
+  //           stroke="currentColor"
+  //           viewBox="0 0 24 24"
+  //         >
+  //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+  //         </svg>
+  //       </div>
+  //       {isOpen && (
+  //         <div className="absolute z-50 mt-1 w-32 bg-white border rounded-md shadow-lg">
+  //           {statuses.map((status) => {
+  //             const itemStyles = getStatusStyles(status);
+  //             return (
+  //               <div
+  //                 key={status}
+  //                 onClick={(e) => handleStatusChange(e, status)}
+  //                 className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 flex items-center gap-2 ${
+  //                   currentStatus?.toLowerCase() === status.toLowerCase() ? 'bg-gray-50' : ''
+  //                 }`}
+  //               >
+  //                 <span className={`h-1.5 w-1.5 rounded-full ${itemStyles.dot}`}></span>
+  //                 <span className={itemStyles.text}>{status}</span>
+  //               </div>
+  //             );
+  //           })}
+  //         </div>
+  //       )}
+  //     </div>
+  //   );
+  // };
+  
+  const StatusDropdown = ({ currentStatus, onStatusChange, phoneNumber }) => {
     const statuses = ['Pending', 'Approved', 'Rejected'];
     const [isOpen, setIsOpen] = useState(false);
   
@@ -278,7 +569,6 @@ const FlatRequestsTable = () => {
       </div>
     );
   };
-  
 
   const handleSearch = (termOrRequest) => {
     if (typeof termOrRequest === 'string') {
@@ -339,9 +629,163 @@ const FlatRequestsTable = () => {
     }
   };
 
+  const handleDeleteRequest = async (requestId) => {
+    try {
+      // First, get the request details
+      const requestRef = doc(db, "flatRequests", requestId);
+      const requestSnap = await getDoc(requestRef);
+      
+      if (!requestSnap.exists()) {
+        toast.error("Request not found");
+        return false;
+      }
+      
+      const requestData = requestSnap.data();
+      const phoneNumber = requestData.phoneNumber;
+      const flatId = requestData.flatId;
+      
+      // Find the user document
+      if (phoneNumber) {
+        const userQuery = query(
+          collection(db, 'users'),
+          where('phoneNumber', '==', phoneNumber)
+        );
+        
+        const userSnap = await getDocs(userQuery);
+        
+        if (!userSnap.empty) {
+          const userDoc = userSnap.docs[0];
+          const userData = userDoc.data();
+          const userRef = doc(db, 'users', userDoc.id);
+          
+          // Check if the user has flats data
+          if (userData.flats) {
+            const currentFlats = { ...userData.flats };
+            
+            // Remove from pending if present
+            if (currentFlats.pending && Array.isArray(currentFlats.pending)) {
+              currentFlats.pending = currentFlats.pending.filter(
+                flat => flat.flatId !== flatId
+              );
+            }
+            
+            // Remove from approved if present
+            if (currentFlats.approved && Array.isArray(currentFlats.approved)) {
+              currentFlats.approved = currentFlats.approved.filter(
+                flat => flat.flatId !== flatId
+              );
+            }
+            
+            // Update user document with cleaned flats data
+            await updateDoc(userRef, { flats: currentFlats });
+            console.log(`Removed flat ${flatId} from user's flats data`);
+          }
+          
+          // If the request status was 'Approved', we may need to remove the user from flat users list
+          if (requestData.status === 'Approved') {
+            try {
+              const flatRef = doc(db, 'flats', flatId);
+              const flatSnap = await getDoc(flatRef);
+              
+              if (flatSnap.exists()) {
+                const flatData = flatSnap.data();
+                
+                if (flatData.users && Array.isArray(flatData.users)) {
+                  // Filter out this user from the flat's users array
+                  const updatedUsers = flatData.users.filter(
+                    user => user.userId !== phoneNumber
+                  );
+                  
+                  // Update the flat document
+                  await updateDoc(flatRef, { 
+                    users: updatedUsers,
+                    updatedAt: new Date()
+                  });
+                  
+                  console.log(`Removed user from flat ${flatId}`);
+                }
+              }
+            } catch (flatError) {
+              console.error("Error updating flat document:", flatError);
+              // Continue with deletion even if this part fails
+            }
+          }
+        }
+      }
+      
+      // Finally, delete the request from flatRequests collection
+      await deleteDoc(requestRef);
+      console.log(`Deleted request ${requestId}`);
+      
+      // Optionally, send a notification about the request deletion
+      if (phoneNumber) {
+        try {
+          const notificationData = {
+            phoneNumber: phoneNumber,
+            title: "Flat Request Deleted",
+            body: `Your flat request for ${requestData.wing}-${requestData.flatNumber} has been removed.`,
+            additionalData: {
+              type: "flat_request_deleted",
+              flatId: flatId,
+              wing: requestData.wing,
+              flatNumber: requestData.flatNumber
+            }
+          };
+          
+          const response = await fetch('https://puri-dashboard-server.onrender.com/api/send-user-notification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(notificationData),
+          });
+          
+          if (response.ok) {
+            console.log("Deletion notification sent successfully");
+          }
+        } catch (notifyError) {
+          console.error("Error sending deletion notification:", notifyError);
+          // Continue even if notification fails
+        }
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error deleting request:", error);
+      toast.error("Failed to delete request");
+      return false;
+    }
+  };
+
+  // const handleDeleteSelected = (indices = selectedRows) => {
+  //   const selectedCount = Array.isArray(indices) ? indices.length : 1;
+  //   setDeleteItemName(`${selectedCount} selected ${selectedCount === 1 ? 'request' : 'requests'}`);
+  //   setDeleteFunction(() => async () => {
+  //     try {
+  //       const requestIds = (Array.isArray(indices) ? indices : [indices]).map(index => {
+  //         const relativeIndex = index - indexOfFirstItem;
+  //         return currentItems[relativeIndex].id;
+  //       });
+        
+  //       for (const id of requestIds) {
+  //         await deleteDoc(doc(db, "flatRequests", id));
+  //       }
+        
+  //       setSelectedRows([]);
+  //       toast.success(`${selectedCount} ${selectedCount === 1 ? 'request' : 'requests'} deleted successfully`);
+  //       setIsDeleteModalOpen(false);
+  //     } catch (error) {
+  //       console.error("Error deleting requests:", error);
+  //       toast.error("Failed to delete selected requests");
+  //     }
+  //   });
+  //   setIsDeleteModalOpen(true);
+  // };
+
   const handleDeleteSelected = (indices = selectedRows) => {
     const selectedCount = Array.isArray(indices) ? indices.length : 1;
     setDeleteItemName(`${selectedCount} selected ${selectedCount === 1 ? 'request' : 'requests'}`);
+    
     setDeleteFunction(() => async () => {
       try {
         const requestIds = (Array.isArray(indices) ? indices : [indices]).map(index => {
@@ -349,21 +793,31 @@ const FlatRequestsTable = () => {
           return currentItems[relativeIndex].id;
         });
         
+        let successCount = 0;
         for (const id of requestIds) {
-          await deleteDoc(doc(db, "flatRequests", id));
+          const success = await handleDeleteRequest(id);
+          if (success) successCount++;
         }
         
         setSelectedRows([]);
-        toast.success(`${selectedCount} ${selectedCount === 1 ? 'request' : 'requests'} deleted successfully`);
+        
+        if (successCount === requestIds.length) {
+          toast.success(`${selectedCount} ${selectedCount === 1 ? 'request' : 'requests'} deleted successfully`);
+        } else if (successCount > 0) {
+          toast.warning(`Deleted ${successCount} out of ${requestIds.length} requests`);
+        } else {
+          toast.error("Failed to delete selected requests");
+        }
+        
         setIsDeleteModalOpen(false);
       } catch (error) {
         console.error("Error deleting requests:", error);
         toast.error("Failed to delete selected requests");
       }
     });
+    
     setIsDeleteModalOpen(true);
   };
-
   const CheckboxWithTick = ({ isSelected, onClick, isMinusIcon = false }) => (
     <div
       onClick={onClick}
@@ -515,10 +969,28 @@ const FlatRequestsTable = () => {
                     {request.createdAt ? dayjs(request.createdAt.toDate()).format('D MMM, YYYY') : 'N/A'}
                   </td>
                   <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-        <StatusDropdown
+        {/* <StatusDropdown
           currentStatus={request.status}
           onStatusChange={(newStatus) => handleStatusChange(request.id, newStatus)}
-        />
+        /> */}
+         {/* <StatusDropdown
+    currentStatus={request.status}
+    phoneNumber={request.phoneNumber}
+    onStatusChange={(newStatus) => handleStatusChange(request.id, newStatus, request.phoneNumber)}
+  /> */}
+  <StatusDropdown
+    currentStatus={request.status}
+    phoneNumber={request.phoneNumber}
+    onStatusChange={(newStatus) => handleStatusChange(
+      request.id, 
+      newStatus, 
+      request.phoneNumber, 
+      { 
+        wing: request.wing || '', 
+        flatNumber: request.flatNumber || '' 
+      }
+    )}
+  />
       </td>
                  
                   {/* <td className="px-6 py-4">

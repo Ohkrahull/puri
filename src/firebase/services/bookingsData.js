@@ -48,7 +48,7 @@ export const getBookedSlots = async (date, amenity) => {
 // Update this function to handle both creation and updates
 export const saveBooking = async (bookingData, isUpdate = false) => {
   try {
-    console.log('Saving booking:', { bookingData, isUpdate });
+    // console.log('Saving booking:', { bookingData, isUpdate });
     
     if (!bookingData.phoneNumber) {
       throw new Error('User ID is required for booking');
@@ -64,7 +64,7 @@ export const saveBooking = async (bookingData, isUpdate = false) => {
         updatedAt: serverTimestamp(),
       });
       
-      console.log('Booking updated successfully with ID:', bookingData.id);
+      // console.log('Booking updated successfully with ID:', bookingData.id);
       return bookingData.id;
     } else {
       // If creating a new booking
@@ -74,7 +74,7 @@ export const saveBooking = async (bookingData, isUpdate = false) => {
         type: bookingData.type,
       });
       
-      console.log('New booking saved successfully with ID:', bookingRef.id);
+      // console.log('New booking saved successfully with ID:', bookingRef.id);
       return bookingRef.id;
     }
   } catch (error) {
@@ -95,7 +95,7 @@ export const updateBooking = async (bookingId, updatedBooking) => {
       updatedAt: serverTimestamp(),
     });
     
-    console.log('Booking updated successfully with ID:', bookingId);
+    // console.log('Booking updated successfully with ID:', bookingId);
     return bookingId;
   } catch (error) {
     console.error('Error updating booking:', error);
@@ -190,7 +190,7 @@ export const fetchAuthorizedUserDetails = async (phoneNumber) => {
       
       return userData;
     } else {
-      console.log(`No authorized user found for phone number: ${phoneNumber}`);
+      // console.log(`No authorized user found for phone number: ${phoneNumber}`);
       return null;
     }
   } catch (error) {

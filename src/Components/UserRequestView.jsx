@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, arrayUnion } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
 import { toast } from 'react-toastify';
+import { sendNotificationToUser } from '../utils/notificationUtils';
 
 const UserRequestView = () => {
   const { id } = useParams();
@@ -78,6 +79,113 @@ const UserRequestView = () => {
     fetchData();
   }, [id, db]);
 
+  // const handleStatus = async (newStatus) => {
+  //   try {
+  //     // Reference to the flat request document
+  //     const requestRef = doc(db, 'flatRequests', id);
+      
+  //     // Find the user document
+  //     const userQuery = query(
+  //       collection(db, 'users'),
+  //       where('phoneNumber', '==', requestData.phoneNumber)
+  //     );
+  //     const userSnap = await getDocs(userQuery);
+
+  //     if (!userSnap.empty) {
+  //       const userDoc = userSnap.docs[0];
+  //       const userData = userDoc.data();
+  //       const userRef = doc(db, 'users', userDoc.id);
+
+  //       // Prepare the flat request details
+  //       const flatRequestDetails = {
+  //         flatId: requestData.flatId,
+  //         flatNumber: requestData.flatNumber,
+  //         wing: requestData.wing
+  //       };
+
+  //       if (newStatus === 'Approved') {
+  //         // 1. Update user's authorizedUsers document
+  //         // Ensure flats and its sub-fields exist
+  //         const currentFlats = userData.flats || {};
+  //         const currentPending = currentFlats.pending || [];
+  //         const currentApproved = currentFlats.approved || [];
+
+  //         // Remove the specific flat from pending
+  //         const updatedPending = currentPending.filter(
+  //           flat => flat.flatId !== flatRequestDetails.flatId
+  //         );
+
+  //         // Add the flat to approved
+  //         const updatedApproved = [...currentApproved, flatRequestDetails];
+
+  //         // Update the entire flats structure in authorizedUsers
+  //         await updateDoc(userRef, {
+  //           flats: {
+  //             ...currentFlats,
+  //             pending: updatedPending,
+  //             approved: updatedApproved
+  //           }
+  //         });
+          
+  //         // If documents exist, add them to the user's document
+  //         if (requestData.documents) {
+  //           await updateDoc(userRef, {
+  //             documents: requestData.documents
+  //           });
+  //         }
+
+  //         // 2. Update the flats document to add this user
+  //         const flatRef = doc(db, 'flats', requestData.flatId);
+          
+  //         // Determine isResiding based on residenceType (assuming owners are residing unless specified)
+  //         const isResiding = requestData.residenceType === 'tenant' ? false : true;
+          
+  //         // Create the new user entry for the flat
+  //         const newUserEntry = {
+  //           userId: requestData.phoneNumber,
+  //           role: requestData.residenceType || 'owner', // Use residenceType as role
+  //           isResiding: isResiding
+  //         };
+          
+  //         // Add the user to the flat's users array
+  //         await updateDoc(flatRef, {
+  //           users: arrayUnion(newUserEntry),
+  //           updatedAt: new Date()
+  //         });
+
+  //         // 3. Update the flat request status
+  //         await updateDoc(requestRef, {
+  //           status: newStatus
+  //         });
+          
+  //         // Update local state
+  //         setRequestData(prev => ({
+  //           ...prev,
+  //           status: newStatus
+  //         }));
+
+  //         toast.success(`Request ${newStatus.toLowerCase()} successfully`);
+  //       } else {
+  //         // Handle other status changes (Rejected, Pending)
+  //         await updateDoc(requestRef, {
+  //           status: newStatus
+  //         });
+          
+  //         setRequestData(prev => ({
+  //           ...prev,
+  //           status: newStatus
+  //         }));
+
+  //         toast.success(`Request ${newStatus.toLowerCase()} successfully`);
+  //       }
+  //     } else {
+  //       toast.error('User not found');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error updating status:', error);
+  //     toast.error('Failed to update status');
+  //   }
+  // };
   const handleStatus = async (newStatus) => {
     try {
       // Reference to the flat request document
@@ -163,9 +271,26 @@ const UserRequestView = () => {
             status: newStatus
           }));
 
+          // 4. Send notification to the user about approval
+          const notificationTitle = "Flat Request Approved";
+          const notificationBody = `Your flat request for ${flatRequestDetails.wing}-${flatRequestDetails.flatNumber} has been approved. Welcome to the community!`;
+          
+          await sendNotificationToUser(
+            requestData.phoneNumber,
+            notificationTitle,
+            notificationBody,
+            {
+              type: "flat_request",
+              requestId: id,
+              status: "approved",
+              wing: flatRequestDetails.wing,
+              flatNumber: flatRequestDetails.flatNumber
+            }
+          );
+
           toast.success(`Request ${newStatus.toLowerCase()} successfully`);
-        } else {
-          // Handle other status changes (Rejected, Pending)
+        } else if (newStatus === 'Rejected') {
+          // Handle rejection status
           await updateDoc(requestRef, {
             status: newStatus
           });
@@ -174,6 +299,52 @@ const UserRequestView = () => {
             ...prev,
             status: newStatus
           }));
+
+          // Send notification about rejection
+          const notificationTitle = "Flat Request Status Update";
+          const notificationBody = `Your flat request for ${requestData.wing}-${requestData.flatNumber} has been rejected. Please contact support for more information.`;
+          
+          await sendNotificationToUser(
+            requestData.phoneNumber,
+            notificationTitle,
+            notificationBody,
+            {
+              type: "flat_request",
+              requestId: id,
+              status: "rejected",
+              wing: requestData.wing,
+              flatNumber: requestData.flatNumber
+            }
+          );
+
+          toast.success(`Request ${newStatus.toLowerCase()} successfully`);
+        } else {
+          // Handle other status changes (e.g., Pending)
+          await updateDoc(requestRef, {
+            status: newStatus
+          });
+          
+          setRequestData(prev => ({
+            ...prev,
+            status: newStatus
+          }));
+
+          // Optional: Send notification about status change
+          const notificationTitle = "Flat Request Status Update";
+          const notificationBody = `Your flat request for ${requestData.wing}-${requestData.flatNumber} status has been changed to ${newStatus}.`;
+          
+          await sendNotificationToUser(
+            requestData.phoneNumber,
+            notificationTitle,
+            notificationBody,
+            {
+              type: "flat_request",
+              requestId: id,
+              status: newStatus.toLowerCase(),
+              wing: requestData.wing,
+              flatNumber: requestData.flatNumber
+            }
+          );
 
           toast.success(`Request ${newStatus.toLowerCase()} successfully`);
         }

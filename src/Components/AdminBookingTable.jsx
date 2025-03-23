@@ -434,6 +434,9 @@ const handleSaveBooking = async (bookingData) => {
     setIsDeleteModalOpen(true);
   };
 
+
+  
+
   const handleSaveEdit = async (updatedBooking) => {
     try {
       await updateBooking(updatedBooking.id, updatedBooking);
@@ -989,20 +992,22 @@ const handleSaveBooking = async (bookingData) => {
   };
 
 
-  const getFlatInfo = (ticket) => {
-    // Check for nested flats structure (approved flats)
-    if (ticket.userInfo?.flats?.approved && Array.isArray(ticket.userInfo.flats.approved) && ticket.userInfo.flats.approved.length > 0) {
-      return ticket.userInfo.flats.approved.map(flat => 
+  const getFlatInfo = (booking) => {
+    // If the booking has specific flat info
+    if (booking.userDetails?.currentFlat) {
+      return `${booking.userDetails.currentFlat.wing || ""}-${booking.userDetails.currentFlat.flatNumber || ""}`;
+    }
+    
+    // If booking.userDetails has flats.approved array
+    if (booking.userDetails?.flats && Array.isArray(booking.userDetails.flats)) {
+      // Get all flats from the approved array
+      return booking.userDetails.flats.map(flat => 
         `${flat.wing || ""}-${flat.flatNumber || ""}`
       ).join(", ");
     }
     
-    // If the ticket has specific user info with wing and flatNumber directly
-    if (ticket.userInfo?.wing && ticket.userInfo?.flatNumber) {
-      return `${ticket.userInfo.wing}-${ticket.userInfo.flatNumber}`;
-    }
-    
-    return 'N/A';
+    // Fallback to traditional way if structured data isn't available
+    return `${booking.userDetails?.wing || "N/A"}-${booking.userDetails?.flatNumber || "N/A"}`;
   };
     return (
       <>

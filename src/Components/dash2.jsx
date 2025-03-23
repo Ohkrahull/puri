@@ -13,6 +13,7 @@ import VisitorsComponent from "./Visitor";
 import SupportDashTable from "../Tables/SupportDashTable";
 import RentalReqMain from './RentalReqMain'
 import { useSOS } from "../context/SosContext";
+import Dashbd from "./Dashbd";
 
 const Dashboard = () => {
   const { bookings, updateBooking, deleteBooking } = useAuth();
@@ -57,6 +58,9 @@ const Dashboard = () => {
       </p>
 
       <button onClick={testSOS}>Test SOS Alert</button>
+      {/* <div>
+        <Dashbd/>
+      </div> */}
 
       <div className="mt-6">
         <DashboardMetrics />

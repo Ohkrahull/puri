@@ -30,19 +30,10 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
       onItemClick(user);
     };
 
-    const getRoleDisplay = (roles) => {
-      if (!roles) return "No Role";
-      const roleMap = {
-        admin: "Admin",
-        booking: "Booking Manager",
-        constructionUpdate: "Construction Update",
-        documents: "Legal Document"
-      };
-      const activeRoles = Object.entries(roles)
-        .filter(([key, value]) => value === true && roleMap[key])
-        .map(([key]) => roleMap[key]);
-      return activeRoles.length > 0 ? activeRoles.join(' | ') : "No Role";
-    };
+    const getRoleDisplay = (roles)=>{
+      if(!roles) return "Staff";
+      return roles.admin === true? "Admin": "Staff"
+    }
   
     const filteredUsers = users.filter(
       (user) =>
@@ -221,13 +212,9 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
       });
     };
     const getRoleDisplay = (roles) => {
-      if (!roles) return "No Role Assigned";
-      if (roles.admin) return "Admin";
-      if (roles.booking) return "Booking Manager";
-      if (roles.documents) return "Legal Documents";
-      if (roles.constructionUpdate) return "Construction Update";
-      return "No Role Assigned";
-    };
+      if(!roles) return "Staff";
+      return roles.admin === true? "Admin": "Staff";
+    }
 
     const handleSelectAll = () => {
       if (selectedRows.length === filteredUsers.length) {
@@ -326,34 +313,21 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
       setIsEditModalOpen(true);
     };
   
-    const handleRoleSelect = (role) => {
+    const handleRoleSelect = (role) =>{
       setSelectedRole(role);
       setIsRoleDropdownOpen(false);
-    
-      if (role === "Sort Role") {
+
+      if(role === "Sort Role"){
         setFilteredUsers(users);
-      } else {
-        const filtered = users.filter(user => {
-          if (user.roles) {
-            switch(role) {
-              case "Admin":
-                return user.roles.admin;
-              case "Booking Manager":
-                return user.roles.booking;
-              case "Legal Documents":
-                return user.roles.documents;
-              case "Construction Update":
-                return user.roles.constructionUpdate;
-              default:
-                return false;
-            }
-          }
-          return false;
-        });
+      } else if(role === "Admin"){
+        const filtered = users.filter(user => user.roles && user.roles.admin === true);
+        setFilteredUsers(filtered);
+      } else if(role === "Staff"){
+        const filtered = users.filter(user => !user.roles || user.roles.admin !==true);
         setFilteredUsers(filtered);
       }
-      setCurrentPage(1);
-    };
+      setCurrentPage(1)
+    }
 
     const truncateText = (text, charLimit = 20) => {
       if (text.length <= charLimit) {
@@ -402,9 +376,7 @@ const SearchInput = ({ users, onSearch, onItemClick }) => {
     const roleOptions = [
       "Sort Role",
       "Admin",
-      "Booking Manager",
-      "Legal Documents",
-      "Construction Update"
+      "Staff",
     ];
 
     const renderTableContent = () => {

@@ -735,11 +735,13 @@
 
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { collection, getDocs, query, orderBy, where, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, where, doc, deleteDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import DeleteModal from '../Modals/DeleteModal';
+import { sendNotificationToUser } from '../utils/notificationUtils';
+
 
 const SearchInput = ({ supportDocuments, onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -958,23 +960,81 @@ const SupportTable = () => {
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const isAllSelected = currentItems.length > 0 && selectedRows.length === currentItems.length;
 
-  const fetchSupportData = useCallback(async () => {
+  const fetchSupportData = useCallback(() => {
     try {
       setIsLoading(true);
-      const data = await getAllSupportDocuments();
-      setSupportData(data);
-      setFilteredData(data);
-      setIsLoading(false);
+  
+      // Create a query to fetch support documents ordered by creation time
+      const supportQuery = query(
+        collection(db, 'support'), 
+        orderBy('createdAt', 'desc')
+      );
+  
+      // Set up a real-time listener
+      const unsubscribe = onSnapshot(supportQuery, async (supportSnapshot) => {
+        const supportTickets = await Promise.all(
+          supportSnapshot.docs.map(async (supportDoc) => {
+            const supportData = { id: supportDoc.id, ...supportDoc.data() };
+            
+            // If phoneNumber exists, fetch user info
+            if (supportData.phoneNumber) {
+              try {
+                const usersQuery = query(
+                  collection(db, 'users'),
+                  where('phoneNumber', '==', supportData.phoneNumber)
+                );
+                const usersSnapshot = await getDocs(usersQuery);
+                
+                if (!usersSnapshot.empty) {
+                  const userData = usersSnapshot.docs[0].data();
+                  supportData.userInfo = userData;
+                  
+                  // Ensure ticketId is set
+                  if (!supportData.ticketId) {
+                    supportData.ticketId = Math.floor(100000 + Math.random() * 900000).toString();
+                  }
+                }
+              } catch (userError) {
+                console.error('Error fetching user data:', userError);
+              }
+            }
+            
+            return supportData;
+          })
+        );
+  
+        // Update state with new data
+        setSupportData(supportTickets);
+        setFilteredData(supportTickets);
+        setIsLoading(false);
+      }, (error) => {
+        console.error('Error fetching support documents in real-time:', error);
+        setError('Failed to fetch support data');
+        setIsLoading(false);
+        toast.error('Failed to fetch support data');
+      });
+  
+      // Return the unsubscribe function to clean up the listener
+      return () => unsubscribe();
     } catch (error) {
-      setError('Failed to fetch support data');
+      console.error('Error setting up real-time support listener:', error);
+      setError('Failed to set up support data listener');
       setIsLoading(false);
-      toast.error('Failed to fetch support data');
+      toast.error('Failed to set up support data listener');
     }
   }, []);
 
-  useEffect(() => {
-    fetchSupportData();
-  }, [fetchSupportData]);
+  // Modify useEffect to handle the unsubscribe
+useEffect(() => {
+  const unsubscribe = fetchSupportData();
+  
+  // Cleanup function to unsubscribe from the listener
+  return () => {
+    if (typeof unsubscribe === 'function') {
+      unsubscribe();
+    }
+  };
+}, [fetchSupportData]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -991,6 +1051,8 @@ const SupportTable = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
@@ -1019,14 +1081,115 @@ const SupportTable = () => {
     setCurrentPage(1);
   };
 
-  const updateStatus = async (itemId, newStatus) => {
+  const updateStatus = async (itemId, newStatus, item) => {
     try {
-      await updateSupportStatus(itemId, newStatus.toLowerCase());
-      fetchSupportData(); // Refresh data
-      toast.success('Status updated successfully');
+      // Validate input parameters
+      if (!itemId || !newStatus) {
+        console.error('Invalid input: itemId or newStatus is missing');
+        toast.error('Invalid status update request');
+        return;
+      }
+  
+      // Validate item and phone number
+      if (!item || !item.phoneNumber) {
+        console.error('No phone number found for the support item', item);
+        toast.error('Cannot send notification: User phone number missing');
+        return;
+      }
+  
+      // Reference to the support item
+      const supportRef = doc(db, 'support', itemId);
+      
+      // Prepare status update
+      const statusUpdate = { 
+        status: newStatus.toLowerCase(),
+        updatedAt: new Date() 
+      };
+  
+      // Update the status in Firestore
+      await updateDoc(supportRef, statusUpdate);
+      
+      // Immediately update the UI
+      const updatedSupportData = supportData.map(supportItem => 
+        supportItem.id === itemId 
+          ? { ...supportItem, ...statusUpdate } 
+          : supportItem
+      );
+      
+      // Update both state variables
+      setSupportData(updatedSupportData);
+      setFilteredData(prevFilteredData => 
+        prevFilteredData.map(supportItem => 
+          supportItem.id === itemId 
+            ? { ...supportItem, ...statusUpdate } 
+            : supportItem
+        )
+      );
+  
+      // Prepare notification details
+      const phoneNumber = item.phoneNumber;
+      const ticketId = item.ticketId || 'N/A';
+      
+      let notificationTitle = '';
+      let notificationBody = '';
+      
+      // Prepare different notification messages based on status
+      switch (newStatus.toLowerCase()) {
+        case 'approved':
+          notificationTitle = 'Support Request Approved';
+          notificationBody = `Your support request (#${ticketId}) has been approved.`;
+          break;
+        case 'rejected':
+          notificationTitle = 'Support Request Rejected';
+          notificationBody = `Your support request (#${ticketId}) has been rejected. Please contact support for more information.`;
+          break;
+        case 'pending':
+        default:
+          notificationTitle = 'Support Request Status Update';
+          notificationBody = `Your support request (#${ticketId}) status has been changed to ${newStatus}.`;
+          break;
+      }
+      
+      try {
+        // Send notification to the user
+        const notificationResult = await sendNotificationToUser(
+          phoneNumber,
+          notificationTitle,
+          notificationBody,
+          {
+            type: 'support_update',
+            supportId: itemId,
+            status: newStatus.toLowerCase(),
+            ticketId: ticketId
+          }
+        );
+  
+        // Check if notification was successful
+        if (notificationResult.success === false) {
+          throw new Error('Notification sending failed');
+        }
+  
+        // Show success toast
+        toast.success(`Status updated to ${newStatus} and notification sent`);
+      } catch (notificationError) {
+        console.error('Failed to send notification:', notificationError);
+        toast.warn(`Status updated to ${newStatus}, but notification failed`);
+      }
+  
     } catch (error) {
       console.error('Error updating status:', error);
-      toast.error('Failed to update status');
+      
+      // More detailed error handling
+      if (error.code === 'permission-denied') {
+        toast.error('You do not have permission to update this support request');
+      } else if (error.code === 'not-found') {
+        toast.error('Support request not found');
+      } else {
+        toast.error('Failed to update status');
+      }
+      
+      // Revert UI change on error by refreshing data
+      fetchSupportData();
     }
   };
 
@@ -1301,10 +1464,10 @@ const SupportTable = () => {
             {item.category || 'N/A'}
           </td>
           <td className="px-6 py-4">
-            <StatusDropdown
-              currentStatus={item.status}
-              onStatusChange={(newStatus) => updateStatus(item.id, newStatus)}
-            />
+          <StatusDropdown
+  currentStatus={item.status}
+  onStatusChange={(newStatus) => updateStatus(item.id, newStatus, item)}
+/>
           </td>
         </tr>
       );
