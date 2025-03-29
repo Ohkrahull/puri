@@ -673,7 +673,7 @@ const GuardTable = () => {
                     <FlatNumberDisplay flatNumbers={helper.flatNumbers || "N/A"} style={{fontSize:'14px'}} />
                   </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" style={{fontSize:'14px'}}>
-                    {helper.guardPhoneNumber || 'N/A'}
+                    {helper.phoneNumber || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" style={{fontSize:'14px'}}>
                   {helper.email || 'N/A'}

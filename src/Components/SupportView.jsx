@@ -5,7 +5,7 @@ import styles from "./CustomScrollbar.module.css";
 import SideBar from './SideBar';
 import FeedbackForm_Left from './FeedbackForm_Left';
 import ReferalsForm_Left from './referralForm_left';
-import PersonalInfoForm from './PersonalInfoForm';
+import PersonalInfoForm from "./PersonalInfoFormSP";
 import SupportForm_left from '../Components/supportForm_left'
 import Loader from './Loader';
 import { ChevronLeft } from 'lucide-react';

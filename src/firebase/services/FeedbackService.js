@@ -2,7 +2,7 @@ import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnap
 import { getApp } from 'firebase/app';
 import { fetchAuthorizedUserDetails } from './bookingsData';
 
-const FEEDBACK_COLLECTION = 'feedback';
+const FEEDBACK_COLLECTION = 'feedbacks';
 const db = getFirestore(getApp());
 
 // Function to save feedback
@@ -123,7 +123,7 @@ export const fetchUserFeedback = async (uid) => {
   }
 
   try {
-    const feedbackRef = collection(db, 'feedback');
+    const feedbackRef = collection(db, 'feedbacks');
     const q = query(feedbackRef, where('uid', '==', uid));
     const querySnapshot = await getDocs(q);
     

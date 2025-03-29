@@ -6746,6 +6746,7 @@
 // };
 
 // export default NotificationContext;
+
 import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getFirestore, limit, deleteDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -6828,8 +6829,15 @@ export const NotificationProvider = ({ children }) => {
     let initials = name.split(' ').map(n => n[0]).join('');
     let backgroundColor = '#E5E7EB'; // Default gray
     
+    if (notification.type === 'emergency') {
+      const emergencyType = notification.emergencyType || notification.data?.emergencyType;
+      if (emergencyType) {
+        action = `has sent an emergency: ${emergencyType}`;
+        backgroundColor = '#FEE2E2'; // Light red for emergencies
+      }
+    }
     // Handle different notification types
-    if (notification.type === 'support') {
+    else if (notification.type === 'support') {
       action = "has raised a support ticket";
       target = notification.data?.category ? `for ${notification.data.category}` : "";
       backgroundColor = '#FEE2E2'; // Light red for support tickets
@@ -6908,6 +6916,16 @@ export const NotificationProvider = ({ children }) => {
     } else {
       time = 'Recent';
     }
+
+    // Generate title based on notification type and data
+  let title = notification.title || `New ${notification.type || 'notification'}`;
+  
+  // For emergency notifications, update the title
+  if (notification.type === 'emergency' && notification.emergencyType) {
+    title = `Emergency: ${notification.emergencyType}`;
+  } else if (notification.type === 'emergency' && notification.data?.emergencyType) {
+    title = `Emergency: ${notification.data.emergencyType}`;
+  }
     
     return {
       id: notification.id,
@@ -6920,7 +6938,8 @@ export const NotificationProvider = ({ children }) => {
       read: notification.read || false,
       data: notification.data,
       type: notification.type,
-      title: notification.title || `New ${notification.type || 'notification'}`,
+      // title: notification.title || `New ${notification.type || 'notification'}`,
+      title,
       receivedAt: Date.now() // Add timestamp when this notification was processed
     };
   }, []);

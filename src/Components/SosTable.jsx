@@ -1385,7 +1385,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import { collection, deleteDoc, doc, getFirestore, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, getFirestore, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { getApp } from "firebase/app";
 import SortButton from "../Buttons/Sortdate";
 import DeleteModal from "../Modals/DeleteModal";
@@ -1487,6 +1487,7 @@ const SearchInput = ({ alerts, onSearch }) => {
 
 const SOSTable = () => {
   const [guardUsers, setGuardUsers] = useState({});
+  const [userDetails, setUserDetails] = useState({});
   const [alerts, setAlerts] = useState([]);
   const [filteredAlerts, setFilteredAlerts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -1519,19 +1520,83 @@ const SOSTable = () => {
   const currentItems = filteredAlerts.slice(indexOfFirstItem, indexOfLastItem);
   const isAllSelected = currentItems.length > 0 && selectedRows.length === currentItems.length;
 
+  const fetchUserDetails = async (phoneNumber) => {
+    try {
+      const usersQuery = query(
+        collection(db, "users"),
+        where("phoneNumber", "==", phoneNumber)
+      );
+      
+      const querySnapshot = await getDocs(usersQuery);
+      
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].data();
+        return {
+          firstName: userData.firstName || userData.name || '',
+          lastName: userData.lastName || '',
+          fullName: userData.name || `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return null;
+    }
+  };
+
+   // Process alerts with user details
+   const processAlertsWithUserDetails = async (alertsData) => {
+    const processedAlerts = [];
+    const userCache = { ...userDetails };
+    
+    for (const alert of alertsData) {
+      const phoneNumber = alert.phoneNumber;
+      let userData = null;
+      
+      if (phoneNumber) {
+        // Check if user is already in cache
+        if (userCache[phoneNumber]) {
+          userData = userCache[phoneNumber];
+        } else {
+          // Fetch user details if not in cache
+          userData = await fetchUserDetails(phoneNumber);
+          if (userData) {
+            userCache[phoneNumber] = userData;
+          }
+        }
+      }
+      
+      processedAlerts.push({
+        ...alert,
+        userDetails: userData || {
+          firstName: alert.userName ? alert.userName.split(' ')[0] : '',
+          lastName: alert.userName ? alert.userName.split(' ').slice(1).join(' ') : '',
+          fullName: alert.userName || 'N/A'
+        }
+      });
+    }
+    
+    // Update the cache
+    setUserDetails(userCache);
+    return processedAlerts;
+  };
+
   useEffect(() => {
     const sosQuery = query(
       collection(db, "sosAlerts"),
       orderBy("createdAt", "desc")
     );
 
-    const unsubscribe = onSnapshot(sosQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(sosQuery, async (snapshot) => {
       const sosData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setAlerts(sosData);
-      setFilteredAlerts(sosData);
+      
+      // Process alerts to include user details
+      const processedAlerts = await processAlertsWithUserDetails(sosData);
+      setAlerts(processedAlerts);
+      setFilteredAlerts(processedAlerts);
     }, (error) => {
       console.error("Error fetching SOS alerts:", error);
       toast.error("Failed to fetch SOS alerts");
@@ -1558,7 +1623,9 @@ const SOSTable = () => {
 
   useEffect(() => {
     const filtered = alerts.filter(alert => {
-      const name = `${alert.userDetails?.firstName || ''} ${alert.userDetails?.lastName || ''}`.toLowerCase();
+      const name = alert.userDetails ? 
+        `${alert.userDetails.firstName || ''} ${alert.userDetails.lastName || ''}`.toLowerCase() :
+        (alert.userName || '').toLowerCase();
       const flatNumber = alert.flatNumber?.toString().toLowerCase();
       const type = alert.type?.toLowerCase();
       const search = searchTerm.toLowerCase();
@@ -1587,7 +1654,7 @@ const SOSTable = () => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
-  const handleSearch = (termOrAlert) => {
+   const handleSearch = (termOrAlert) => {
     if (!termOrAlert) {
       setFilteredAlerts(alerts);
       return;
@@ -1599,7 +1666,9 @@ const SOSTable = () => {
     } else {
       const searchStr = termOrAlert.toLowerCase();
       const filtered = alerts.filter(alert => {
-        const name = `${alert.userDetails?.firstName || ''} ${alert.userDetails?.lastName || ''}`.toLowerCase();
+        const name = alert.userDetails ? 
+          `${alert.userDetails.firstName || ''} ${alert.userDetails.lastName || ''}`.toLowerCase() :
+          (alert.userName || '').toLowerCase();
         const flatNumber = alert.flatNumber?.toString().toLowerCase();
         const type = alert.type?.toLowerCase();
         

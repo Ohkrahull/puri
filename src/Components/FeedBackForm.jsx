@@ -100,7 +100,7 @@ const FeedBackForm = () => {
                   <FeedbackForm_Left feedback={feedback} />
                 </div>
                 <div className="w-full lg:w-[calc(30%-16px)]">
-                  <PersonalInfoForm userInfo={feedback.userInfo} />
+                  <PersonalInfoForm userInfo={feedback.userInfo} feedback={feedback}  />
                 </div>
               </div>
             ) : (

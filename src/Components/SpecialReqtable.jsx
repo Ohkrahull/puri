@@ -484,22 +484,7 @@ const SpecialReqTable = () => {
             </div>
             <div className="w-full sm:w-auto">
               <SortButton onSort={handleSort} ref={sortDateRef} />
-              {/* <button
-              className="flex  justify-end text-center"
-              style={{
-                display: 'flex',
-                padding: '12px 16px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                border: '1px solid #D1D5DB',
-                borderRadius: '10px',
-                color: '#6B7280',
-                fontSize: '16px',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-              }}
-            >
-              Filter
-            </button> */}
+              
             </div>
           </div>
         </div>

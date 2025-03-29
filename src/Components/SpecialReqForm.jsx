@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import Special_req_Tell_us from "./Special_req_Tell_Us";
-import PersonalInfoForm from "./PersonalInfoForm";
+import PersonalInfoForm from "./PersonalInfoFormSP";
 import SideBar from './SideBar';
 import styles from "./CustomScrollbar.module.css";
 import "../App.css";

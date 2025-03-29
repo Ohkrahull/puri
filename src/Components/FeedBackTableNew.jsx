@@ -506,6 +506,7 @@
 // };
 
 // export default FeedBackTableNew;
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -538,7 +539,35 @@ const CheckboxWithTick = ({ isSelected, onClick, isMinusIcon = false }) => (
 );
 
 // Helper function to get flat display string
-const getFlatDisplay = (userInfo) => {
+// const getFlatDisplay = (userInfo) => {
+//   if (!userInfo) return 'N/A';
+  
+//   // Check for flats.approved array first
+//   if (userInfo.flats?.approved && Array.isArray(userInfo.flats.approved) && userInfo.flats.approved.length > 0) {
+//     const flat = userInfo.flats.approved[0]; // Display first approved flat
+//     return `${flat.wing || ''} - ${flat.flatNumber || ''}`;
+//   }
+  
+//   // Fallback to wing and flatNumber directly on userInfo
+//   if (userInfo.wing && userInfo.flatNumber) {
+//     return `${userInfo.wing} - ${userInfo.flatNumber}`;
+//   }
+  
+//   return 'N/A';
+// };
+
+const getFlatDisplay = (feedback) => {
+  // First try to use flatId directly from feedback
+  if (feedback.flatId) {
+    // If flatId is in format "flat_Wing_Number" (e.g., "flat_D_102")
+    const matches = feedback.flatId.match(/flat_([A-Z])_(\d+)/);
+    if (matches && matches.length === 3) {
+      return `${matches[1]} - ${matches[2]}`;
+    }
+  }
+  
+  // Fallback to userInfo if flatId parsing fails
+  const userInfo = feedback.userInfo;
   if (!userInfo) return 'N/A';
   
   // Check for flats.approved array first
@@ -554,7 +583,6 @@ const getFlatDisplay = (userInfo) => {
   
   return 'N/A';
 };
-
 // Search input component
 const SearchInput = ({ feedbackList, onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -652,7 +680,7 @@ const SearchInput = ({ feedbackList, onSearch }) => {
 // Implementation of feedback service functions
 const fetchAllFeedback = async () => {
   try {
-    const feedbackQuery = query(collection(db, 'feedback'), orderBy('createdAt', 'desc'));
+    const feedbackQuery = query(collection(db, 'feedbacks'), orderBy('createdAt', 'desc'));
     const feedbackSnapshot = await getDocs(feedbackQuery);
     
     const feedbackItems = await Promise.all(
@@ -690,7 +718,7 @@ const fetchAllFeedback = async () => {
 
 const deleteFeedback = async (id) => {
   try {
-    await deleteDoc(doc(db, 'feedback', id));
+    await deleteDoc(doc(db, 'feedbacks', id));
     return true;
   } catch (error) {
     console.error('Error deleting feedback:', error);
@@ -916,7 +944,7 @@ const FeedBackTableNew = () => {
             {truncatedName}
           </td>
           <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900" style={{minWidth: '120px'}}>
-            {getFlatDisplay(feedback.userInfo)}
+          {getFlatDisplay(feedback)}
           </td>
           <td className="px-6 py-4 whitespace-nowrap" style={{minWidth: '120px'}}>
             {formattedDate}

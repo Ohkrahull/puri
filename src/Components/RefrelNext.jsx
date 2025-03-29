@@ -4,7 +4,7 @@ import { fetchReferralById } from '../firebase/services/Referals';
 import styles from "./CustomScrollbar.module.css";
 import SideBar from './SideBar';
 import ReferalsForm_Left from './referralForm_left';
-import PersonalInfoForm from './PersonalInfoForm';
+import PersonalInfoForm from "./PersonalInfoFormSP";
 import Loader from './Loader';
 import { ChevronLeft } from 'lucide-react';
 
